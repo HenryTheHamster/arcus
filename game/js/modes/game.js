@@ -28,8 +28,8 @@ module.exports = {
           var arrows = state().get('arrows');
           var cooldown = state().get('cooldown');
           arrows.forEach(function(a) {
-            a.pos.x += Math.cos(a.rotation) * a.velocity;
-            a.pos.y += Math.sin(a.rotation) * a.velocity;
+            a.pos.y -= a.vel.y -= 0.01;
+            a.pos.x += a.vel.x;
           });
 
           if(cooldown > 0) {

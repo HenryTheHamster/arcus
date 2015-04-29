@@ -49,10 +49,19 @@ module.exports = {
           return;
         }
 
-        var archer = tracker().get(theArcher);
-
         context.save();
         context.clearRect(0, 0, canvas[0].width, canvas[0].height);
+
+        var archer = tracker().get(theArcher);
+
+        var arrows = tracker().get(theArrows);
+        arrows.forEach(function(a) {
+          context.beginPath();
+          context.arc(a.pos.x, a.pos.y, 10, 0, 2 * Math.PI, false);
+          context.fill();
+          context.stroke();
+          context.closePath();
+        });
 
         context.fillStyle = 'red';
         context.strokeStyle = '#660000';
@@ -76,15 +85,6 @@ module.exports = {
         context.closePath();
 
         context.restore();
-
-        var arrows = tracker().get(theArrows);
-        arrows.forEach(function(a) {
-          context.beginPath();
-          context.arc(a.pos.x, a.pos.y, 10, 0, 2 * Math.PI, false);
-          context.fill();
-          context.stroke();
-          context.closePath();
-        });
       },
       screenResized: function () {
         var dims = dimensions().get();
