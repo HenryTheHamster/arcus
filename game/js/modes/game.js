@@ -7,7 +7,7 @@ module.exports = {
     return function() {
       definePlugin()('StateSeed', function() {
         return {
-          archer: {pos: {x: 100, y: 200},
+          archer: {pos: {x: 100, y: 450},
                    rotation: 0,
                    aim: {x: 0, y: 0} },
           cursor: {x: 0, y: 0},
@@ -28,8 +28,10 @@ module.exports = {
           var arrows = state().get('arrows');
           var cooldown = state().get('cooldown');
           arrows.forEach(function(a) {
-            a.pos.y -= a.vel.y -= 0.01;
-            a.pos.x += a.vel.x;
+            if(a.pos.y < 500) {
+              a.pos.y -= a.vel.y -= 0.01;
+              a.pos.x += a.vel.x;
+            }
           });
 
           if(cooldown > 0) {
