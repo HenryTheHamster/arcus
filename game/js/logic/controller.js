@@ -37,8 +37,8 @@ module.exports = {
                             y: pos('y')
                         },
                         vel: {
-                            x: Math.cos(rot) * 3.0,
-                            y: -Math.sin(rot) * 3.0
+                            x: Math.cos(rot) * 100.0,
+                            y: -Math.sin(rot) * 100.0
                         },
                         velocity: 2.0,
                         rotation: rot

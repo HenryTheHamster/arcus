@@ -4,6 +4,9 @@ module.exports = {
   type: 'ChampionArcher',
   deps: ['DefinePlugin', 'GameBehaviour-Controller'],
   func: function(definePlugin, controller) {
+    var gravity = 50;
+    var arrow_speed = 3.5;
+
     return function() {
       definePlugin()('StateSeed', function() {
         return {
@@ -29,8 +32,9 @@ module.exports = {
           var cooldown = state().get('cooldown');
           arrows.forEach(function(a) {
             if(a.pos.y < 500) {
-              a.pos.y -= a.vel.y -= 0.01;
-              a.pos.x += a.vel.x;
+              a.vel.y -= gravity * delta;
+              a.pos.y -= arrow_speed * a.vel.y * delta;
+              a.pos.x += arrow_speed * a.vel.x * delta;
             }
           });
 
