@@ -1,4 +1,5 @@
 'use strict;'
+var sequence = require('distributedlife-sequence');
 
 module.exports = {
   type: 'ChampionArcher',
@@ -15,7 +16,10 @@ module.exports = {
                    aim: {x: 0, y: 0} },
           cursor: {x: 0, y: 0},
           arrows: [],
-          cooldown: 0
+          attackCooldown: 0,
+          enemyCooldown: 0,
+          enemies: [],
+          data: {}
         };
       });
 
@@ -29,22 +33,51 @@ module.exports = {
       definePlugin()('ServerSideUpdate', ['StateAccess'], function(state) {
         return function (delta) {
           var arrows = state().get('arrows');
-          var cooldown = state().get('cooldown');
+          var attackCooldown = state().get('attackCooldown');
+          var enemies = state().get('enemies');
+          var enemyCooldown = state().get('enemyCooldown');
+
+
+
           arrows.forEach(function(a) {
             if(a.pos.y < 500) {
               a.vel.y -= gravity * delta;
               a.pos.y -= arrow_speed * a.vel.y * delta;
               a.pos.x += arrow_speed * a.vel.x * delta;
+              for(var i = enemies.length - 1; i >= 0; i--) {
+                if(Math.abs(a.pos.x - enemies[i].pos.x) < 10.0 && Math.abs(a.pos.x - enemies[i].pos.x) < 10.0) {
+                   enemies.splice(i, 1);
+                }
+              }
             }
-          });
+          }); 
 
-          if(cooldown > 0) {
-            cooldown = cooldown - 0.1;
+          if(attackCooldown > 0) {
+            attackCooldown = attackCooldown - 0.1;
           }
 
+          if(enemyCooldown > 0) {
+            enemyCooldown -= delta;
+          } else {
+            enemyCooldown = 5;
+            enemies.push({
+                        id: sequence.next('enemies'),
+                        pos: {
+                            x: 1200,
+                            y: 500
+                        },
+                        velocity: 100.0
+                    });
+          }
+          enemies.forEach(function(e) {
+            e.pos.x -= e.velocity * delta;
+          });
+
           return {
-            arrows: arrows,
-            cooldown: cooldown
+            arrowsrows: arrows,
+            attackCooldown: attackCooldown,
+            enemies: enemies,
+            enemyCooldown: enemyCooldown
           };
         };
       });

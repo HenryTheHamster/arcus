@@ -4,6 +4,9 @@ module.exports = {
     type: 'GameBehaviour-Controller',
     deps: ['StateAccess'],
     func: function(state) {
+        var rollUpAnUnnvervingDelay = function () {
+          return Math.round(Math.random() * 6) + Math.round(Math.random() * 6);
+        };
         return {
             cursor: function(cx, cy, data) {
                 var get = state().get;
@@ -25,9 +28,9 @@ module.exports = {
             },
             fire: function(x, y, data) {
                 var get = state().get;
-                var cooldown = get('cooldown');
+                var attackCooldown = get('attackCooldown');
                 var rot = get('archer')('rotation') - Math.PI / 2;
-                if (cooldown <= 0) {
+                if (attackCooldown <= 0) {
                     var arrows = get('arrows');
                     var pos = get('archer')('pos');
                     arrows.push({
@@ -40,14 +43,16 @@ module.exports = {
                             x: Math.cos(rot) * 100.0,
                             y: -Math.sin(rot) * 100.0
                         },
-                        velocity: 2.0,
                         rotation: rot
                     });
                     return {
-                        cooldown: 5,
+                        attackCooldown: 5,
                         arrows: arrows
                     };
                 }
+            },
+            generateEnemy: function() {
+              
             }
         }
     }

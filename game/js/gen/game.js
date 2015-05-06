@@ -11,6 +11,7 @@ entryPoint.run();
 },{"./views/champion-archer":2,"ensemblejs-client":63}],2:[function(require,module,exports){
 'use strict';
 
+
 var $ = require('zepto-browserify').$;
 
 module.exports = {
@@ -21,8 +22,9 @@ module.exports = {
     var arrows;
 
     var theArcher = function (state) { return state.archer; };
+    var theEnemies = function (state) { return state.enemies; };
     var theArrows = function (state) { return state.arrows; };
-    var theCooldown = function (state) { return state.cooldown; };
+    var theData = function (state) { return state.data; };
 
     return {
       setup: function () {
@@ -53,11 +55,22 @@ module.exports = {
         context.clearRect(0, 0, canvas[0].width, canvas[0].height);
 
         var archer = tracker().get(theArcher);
-
+        console.log(tracker().get(theData));
         var arrows = tracker().get(theArrows);
         arrows.forEach(function(a) {
+
           context.beginPath();
           context.arc(a.pos.x, a.pos.y, 10, 0, 2 * Math.PI, false);
+          context.fill();
+          context.stroke();
+          context.closePath();
+        });
+
+
+        var enemies = tracker().get(theEnemies);
+        enemies.forEach(function(e) {
+          context.beginPath();
+          context.arc(e.pos.x, e.pos.y, 20, 0, 2 * Math.PI, false);
           context.fill();
           context.stroke();
           context.closePath();
