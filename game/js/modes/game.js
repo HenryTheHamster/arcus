@@ -19,14 +19,17 @@ module.exports = {
           attackCooldown: 0,
           enemyCooldown: 0,
           enemies: [],
-          data: {}
+          data: {},
+          power: 0,
+          powerInc: 1
         };
       });
 
       definePlugin()('ActionMap', function () {
         return {
           'cursor': [{target: controller().cursor}],
-          'button1': [{target: controller().fire}]
+          'button1': [{target: controller().fire, noEventKey: 'Fire'}],
+          'nothing': [{target: controller().notFire, noEventKey: 'Fire'}]
         };
       });
 
@@ -36,8 +39,6 @@ module.exports = {
           var attackCooldown = state().get('attackCooldown');
           var enemies = state().get('enemies');
           var enemyCooldown = state().get('enemyCooldown');
-
-
 
           arrows.forEach(function(a) {
             if(a.pos.y < 500) {

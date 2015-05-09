@@ -7,8 +7,8 @@
     "npm": "latest"
   },
   "dependencies": {
-    "ensemblejs": "0.0.9",
-    "ensemblejs-client": "0.0.9",
+    "ensemblejs": "1.0.0",
+    "ensemblejs-client": "1.0.0",
     "zepto-browserify": "^1.1.6-1"
   },
   "devDependencies": {

@@ -1,12 +1,12 @@
 'use strict;'
 var sequence = require('distributedlife-sequence');
+
+var max_power = 20;
 module.exports = {
     type: 'GameBehaviour-Controller',
     deps: ['StateAccess'],
     func: function(state) {
-        var rollUpAnUnnvervingDelay = function () {
-          return Math.round(Math.random() * 6) + Math.round(Math.random() * 6);
-        };
+        
         return {
             cursor: function(cx, cy, data) {
                 var get = state().get;
@@ -26,8 +26,18 @@ module.exports = {
                     },
                 };
             },
-            fire: function(x, y, data) {
+            fire: function(data) {
+
                 var get = state().get;
+                var pow = get('power');
+                var inc = get('powerInc');
+                if((pow >= max_power && inc > 0) || (pow <= 0 && inc < 0)) {
+                    inc = -inc;
+                }
+                pow += inc;
+
+
+                
                 var attackCooldown = get('attackCooldown');
                 var rot = get('archer')('rotation') - Math.PI / 2;
                 if (attackCooldown <= 0) {
@@ -50,9 +60,21 @@ module.exports = {
                         arrows: arrows
                     };
                 }
+                return {
+                    power: pow,
+                    powerInc: inc
+                }
             },
-            generateEnemy: function() {
-              
+            notFire: function(data) {
+                var get = state().get;
+                var pow = get('power');
+                var inc = get('powerInc');
+                pow = 0;
+                return {
+                    power: pow,
+                    powerInc: 1
+                }
+              // console.log('Not Fire');
             }
         }
     }
