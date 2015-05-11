@@ -47,7 +47,6 @@ module.exports = {
         return function () {
           
 
-          context.save();
           context.clearRect(0, 0, canvas[0].width, canvas[0].height);
 
           var power = tracker().get(thePower);
@@ -55,16 +54,17 @@ module.exports = {
           var archer = tracker().get(theArcher);
           var arrows = tracker().get(theArrows);
           arrows.forEach(function(a) {
-
+            context.save();
             context.beginPath();
-            context.arc(a.pos.x, a.pos.y, 10, 0, 2 * Math.PI, false);
-            context.fill();
+            context.translate(a.pos.x,a.pos.y);
+            context.rotate(a.rot);
+            context.rect(0, 0, 20, 2);
             context.stroke();
             context.closePath();
+            context.restore();
           });
 
           context.beginPath();
-          console.log(power);
           context.rect(archer.aim.x - 10, archer.aim.y - 10, power, 10);
           context.fill();
           context.stroke();
@@ -102,7 +102,7 @@ module.exports = {
 
           context.fillStyle = 'green';
           context.strokeStyle = '#003300';
-
+          context.save();
           context.beginPath();
           context.translate(archer.pos.x,archer.pos.y);
           context.rotate(archer.rotation);

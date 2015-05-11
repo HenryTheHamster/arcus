@@ -21,7 +21,7 @@ module.exports = {
           enemies: [],
           data: {},
           power: 0,
-          powerInc: 1
+          powerInc: 2
         };
       });
 
@@ -45,9 +45,13 @@ module.exports = {
               a.vel.y -= gravity * delta;
               a.pos.y -= arrow_speed * a.vel.y * delta;
               a.pos.x += arrow_speed * a.vel.x * delta;
+              a.rot = -Math.atan(a.vel.y/a.vel.x)
               for(var i = enemies.length - 1; i >= 0; i--) {
                 if(Math.abs(a.pos.x - enemies[i].pos.x) < enemies[i].col.x && Math.abs(a.pos.y - enemies[i].pos.y) < enemies[i].col.y) {
-                   enemies.splice(i, 1);
+                  enemies[i].health -= 10;
+                  if(enemies[i].health <= 0) {
+                    enemies.splice(i, 1);
+                  }
                 }
               }
             }
@@ -71,7 +75,8 @@ module.exports = {
                             x: 10,
                             y: 10
                         },
-                        velocity: 100.0
+                        velocity: 100.0,
+                        health: 20.0
                     });
           }
           enemies.forEach(function(e) {

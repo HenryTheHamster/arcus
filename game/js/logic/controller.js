@@ -1,7 +1,7 @@
 'use strict;'
 var sequence = require('distributedlife-sequence');
 
-var max_power = 120;
+var max_power = 250;
 module.exports = {
     type: 'GameBehaviour-Controller',
     deps: ['StateAccess'],
@@ -84,7 +84,7 @@ module.exports = {
                             x: Math.cos(rot) * pow,
                             y: -Math.sin(rot) * pow
                         },
-                        rotation: rot
+                        rot: rot
                     });
                     return {
                         power: 0,
