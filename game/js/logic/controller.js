@@ -1,7 +1,7 @@
 'use strict;'
 var sequence = require('distributedlife-sequence');
 
-var max_power = 20;
+var max_power = 120;
 module.exports = {
     type: 'GameBehaviour-Controller',
     deps: ['StateAccess'],
@@ -38,9 +38,40 @@ module.exports = {
 
 
                 
-                var attackCooldown = get('attackCooldown');
-                var rot = get('archer')('rotation') - Math.PI / 2;
-                if (attackCooldown <= 0) {
+                // var attackCooldown = get('attackCooldown');
+                // var rot = get('archer')('rotation') - Math.PI / 2;
+                // if (attackCooldown <= 0) {
+                //     // var arrows = get('arrows');
+                //     // var pos = get('archer')('pos');
+                //     // arrows.push({
+                //     //     id: sequence.next('arrows'),
+                //     //     pos: {
+                //     //         x: pos('x'),
+                //     //         y: pos('y')
+                //     //     },
+                //     //     vel: {
+                //     //         x: Math.cos(rot) * 100.0,
+                //     //         y: -Math.sin(rot) * 100.0
+                //     //     },
+                //     //     rotation: rot
+                //     // });
+                //     // return {
+                //     //     attackCooldown: 5,
+                //     //     arrows: arrows
+                //     // };
+                // }
+                return {
+                    power: pow,
+                    powerInc: inc
+                }
+            },
+            notFire: function(data) {
+                var get = state().get;
+                var pow = get('power');
+                if(pow > 0) {
+                    var inc = get('powerInc');
+                    // console.log(pow);
+                    var rot = get('archer')('rotation') - Math.PI / 2;
                     var arrows = get('arrows');
                     var pos = get('archer')('pos');
                     arrows.push({
@@ -50,29 +81,17 @@ module.exports = {
                             y: pos('y')
                         },
                         vel: {
-                            x: Math.cos(rot) * 100.0,
-                            y: -Math.sin(rot) * 100.0
+                            x: Math.cos(rot) * pow,
+                            y: -Math.sin(rot) * pow
                         },
                         rotation: rot
                     });
                     return {
+                        power: 0,
+                        powerInc: Math.abs(inc),
                         attackCooldown: 5,
                         arrows: arrows
                     };
-                }
-                return {
-                    power: pow,
-                    powerInc: inc
-                }
-            },
-            notFire: function(data) {
-                var get = state().get;
-                var pow = get('power');
-                var inc = get('powerInc');
-                pow = 0;
-                return {
-                    power: pow,
-                    powerInc: 1
                 }
               // console.log('Not Fire');
             }

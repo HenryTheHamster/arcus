@@ -21,19 +21,17 @@ module.exports = {
     var input, context;
     var arrows;
     var $ = require('zepto-browserify').$;
+    var thePower = function (state) { return state.power; };
     var theArcher = function (state) { return state.archer; };
     var theEnemies = function (state) { return state.enemies; };
     var theArrows = function (state) { return state.arrows; };
     var theData = function (state) { return state.data; };
-// 
-    // var dims = dimensions().get();
 
     return function (newDims) {
       var canvas = $('<canvas/>', { id: 'scene' });
       canvas[0].width = newDims.usableWidth;
       canvas[0].height = newDims.usableHeight;
 
-      console.log('SETUP');
       context = canvas[0].getContext('2d');
       
       $('#' + element()).append(canvas);
@@ -52,6 +50,8 @@ module.exports = {
           context.save();
           context.clearRect(0, 0, canvas[0].width, canvas[0].height);
 
+          var power = tracker().get(thePower);
+
           var archer = tracker().get(theArcher);
           var arrows = tracker().get(theArrows);
           arrows.forEach(function(a) {
@@ -62,6 +62,13 @@ module.exports = {
             context.stroke();
             context.closePath();
           });
+
+          context.beginPath();
+          console.log(power);
+          context.rect(archer.aim.x - 10, archer.aim.y - 10, power, 10);
+          context.fill();
+          context.stroke();
+          context.closePath();
 
 
           var enemies = tracker().get(theEnemies);
@@ -99,21 +106,14 @@ module.exports = {
       });
       define()('OnResize', function () {
         return function (newDims) {
-          // dims = newDims;
-          console.log('other lah!');
-          // if (canvas !== undefined) {
-            canvas[0].width = newDims.usableWidth;
-            canvas[0].height = newDims.usableHeight;
-          // }
-          // renderer.setSize(dims.usableWidth, dims.usableHeight);
-          // adapter.setCameraAspectRatio(camera, dims.ratio);
+          canvas[0].width = newDims.usableWidth;
+          canvas[0].height = newDims.usableHeight;
         };
       });
     }
-
   }
 }
-},{"zepto-browserify":80}],3:[function(require,module,exports){
+},{"zepto-browserify":85}],3:[function(require,module,exports){
 
 },{}],4:[function(require,module,exports){
 (function (process){
@@ -22159,10 +22159,11 @@ exports.$ = window.$
 },{}],62:[function(require,module,exports){
 'use strict';
 
+//jshint maxparams: 6
 module.exports = {
   type: 'ClientSideAssembler',
-  deps: ['SocketBehaviour', 'Dimensions', 'Window', 'UpdateLoop', 'OnResize'],
-  func: function (socketBehaviour, dimensions, window, updateLoop, resizeCallbacks) {
+  deps: ['SocketBehaviour', 'Dimensions', 'Window', 'UpdateLoop', 'OnResize', 'OnInitialise'],
+  func: function (socketBehaviour, dimensions, window, updateLoop, resizeCallbacks, onInitialiseCallbacks) {
 
     var each = require('lodash').each;
     var $ = require('zepto-browserify').$;
@@ -22174,13 +22175,14 @@ module.exports = {
         resizeCallback(dims);
       });
     };
-    // $('#' + inputElement()).css('width', dims.usableWidth);
-    // $('#' + inputElement()).css('height', dims.usableHeight);
 
     return {
       assembleAndRun: function () {
-        var socket = socketBehaviour().SocketBehaviour();
-        socket.connect();
+        each(onInitialiseCallbacks(), function (callback) {
+          callback();
+        });
+
+        socketBehaviour().connect();
 
         $(window()).on('load resize', resizeCanvas);
         updateLoop().run();
@@ -22191,7 +22193,7 @@ module.exports = {
 },{"lodash":6,"zepto-browserify":61}],63:[function(require,module,exports){
 'use strict';
 
-var plugins = require('plug-n-play').configure(['View', 'InputMode', 'OnMute', 'OnPause', 'OnResume', 'OnUnmute', 'OnConnect', 'OnDisconnect', 'OnEachFrame', 'OnResize']);
+var plugins = require('plug-n-play').configure(['View', 'InputMode', 'OnMute', 'OnPause', 'OnResume', 'OnUnmute', 'OnConnect', 'OnDisconnect', 'OnEachFrame', 'OnResize', 'OnPacket', 'OnSetup', 'OnError', 'OnInitialise']);
 
 module.exports = {
   load: plugins.load,
@@ -22211,10 +22213,15 @@ module.exports = {
     plugins.set('InputElement', 'input');
 
     plugins.load(require('./ui/dimensions'));
-    plugins.load(require('./ui/display'));
+    plugins.load(require('./ui/effects'));
     plugins.load(require('./events/on_connect'));
     plugins.load(require('./events/on_disconnect'));
     plugins.load(require('./events/on_resize'));
+    plugins.load(require('./events/acknowledge-packet'));
+    plugins.load(require('./events/initialise-state'));
+    plugins.load(require('./events/update-state'));
+    plugins.load(require('./events/initialise-views'));
+    plugins.load(require('./events/on-error'));
     plugins.load(require('./state/tracker'));
     plugins.load(require('./state/shortcuts'));
     plugins.load(require('./input/keyboard'));
@@ -22231,7 +22238,60 @@ module.exports = {
     plugins.load(require('./assembler'));
   }
 };
-},{"./assembler":62,"./events/on_connect":64,"./events/on_disconnect":65,"./events/on_resize":66,"./input/keyboard":67,"./socket/client":68,"./socket/pending-acknowledgements":69,"./state/shortcuts":70,"./state/tracker":71,"./ui/dimensions":72,"./ui/display":73,"./update/loop":74,"./views/fullscreen":75,"./views/layout_icons":76,"./views/pause_resume":77,"./views/player_observer_count":78,"./views/toggle_sound":79,"plug-n-play":9}],64:[function(require,module,exports){
+},{"./assembler":62,"./events/acknowledge-packet":64,"./events/initialise-state":65,"./events/initialise-views":66,"./events/on-error":67,"./events/on_connect":68,"./events/on_disconnect":69,"./events/on_resize":70,"./events/update-state":71,"./input/keyboard":72,"./socket/client":73,"./socket/pending-acknowledgements":74,"./state/shortcuts":75,"./state/tracker":76,"./ui/dimensions":77,"./ui/effects":78,"./update/loop":79,"./views/fullscreen":80,"./views/layout_icons":81,"./views/pause_resume":82,"./views/player_observer_count":83,"./views/toggle_sound":84,"plug-n-play":9}],64:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+  type: 'OnPacket',
+  deps: ['PendingAcknowledgements'],
+  func: function (pendingAcknowledgements) {
+    return function (packet) {
+      pendingAcknowledgements().add(packet.id);
+    };
+  }
+};
+},{}],65:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+  type: 'OnSetup',
+  deps: ['StateTracker'],
+  func: function (tracker) {
+    return function (state) {
+      tracker().updateState(state);
+    };
+  }
+};
+},{}],66:[function(require,module,exports){
+'use strict';
+
+var each = require('lodash').each;
+
+module.exports = {
+  type: 'OnSetup',
+  deps: ['View', 'Dimensions'],
+  func: function (views, dimensions) {
+    return function () {
+      var dims = dimensions().get();
+
+      each(views(), function(view) {
+        view(dims);
+      });
+    };
+  }
+};
+},{"lodash":6}],67:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+  type: 'OnError',
+  func: function() {
+    return function(data) {
+      throw new Error(data);
+    };
+  }
+};
+},{}],68:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -22244,7 +22304,7 @@ module.exports = {
     };
   }
 };
-},{"zepto-browserify":61}],65:[function(require,module,exports){
+},{"zepto-browserify":61}],69:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -22257,7 +22317,7 @@ module.exports = {
     };
   }
 };
-},{"zepto-browserify":61}],66:[function(require,module,exports){
+},{"zepto-browserify":61}],70:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -22271,13 +22331,31 @@ module.exports = {
       $('#' + element()).css('width', dims.usableWidth);
       $('#' + element()).css('height', dims.usableHeight);
 
-      // $('#' + inputElement()).css('margin-top', dims.marginTopBottom);
       $('#' + inputElement()).css('width', dims.usableWidth);
       $('#' + inputElement()).css('height', dims.usableHeight);
     };
   }
 };
-},{"zepto-browserify":61}],67:[function(require,module,exports){
+},{"zepto-browserify":61}],71:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+  type: 'OnPacket',
+  deps: ['StateTracker'],
+  func: function (tracker) {
+    var lastReceivedId = 0;
+
+    return function (packet) {
+      if (packet.id <= lastReceivedId) {
+        return;
+      }
+      lastReceivedId = packet.id;
+
+      tracker().updateState(packet.gameState);
+    };
+  }
+};
+},{}],72:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -22447,83 +22525,96 @@ module.exports = {
     };
   }
 };
-},{"lodash":6,"zepto-browserify":61}],68:[function(require,module,exports){
+},{"lodash":6,"zepto-browserify":61}],73:[function(require,module,exports){
 'use strict';
 
 var each = require('lodash').each;
 var extend = require('lodash').extend;
 var $ = require('zepto-browserify').$;
 
-//jshint maxparams: 8
+//jshint maxparams: 10
 module.exports = {
-  deps: ['Window', 'InputMode', 'GameMode', 'ServerUrl', 'OnConnect', 'OnDisconnect', 'PendingAcknowledgements', 'DisplayBehaviour'],
+  deps: ['Window', 'InputMode', 'GameMode', 'ServerUrl', 'OnConnect', 'OnDisconnect', 'PendingAcknowledgements', 'OnPacket', 'OnSetup', 'OnError'],
   type: 'SocketBehaviour',
-  func: function (window, inputModes, gameMode, serverUrl, onConnectCallbacks, onDisconnectCallbacks, pendingAcknowledgements, displayBehaviour) {
+  func: function (window, inputModes, gameMode, serverUrl, onConnectCallbacks, onDisconnectCallbacks, pendingAcknowledgements, onPacketCallbacks, onSetupCallbacks, onErrorCallbacks) {
+
+    var controls = [];
+
+    var configureEmitFunction = function (socket) {
+      return function () {
+        var packet = {
+          pendingAcks: pendingAcknowledgements().flush(),
+          sentTimestamp: Date.now()
+        };
+
+        each(controls, function (control) {
+          extend(packet, control.getCurrentState());
+        });
+
+        socket.emit('input', packet);
+      };
+    };
+
+    var url = function () {
+      return serverUrl() + gameMode() + '/primary';
+    };
+
     return {
-      SocketBehaviour: function () {
-        var controls = [];
+      connect: function () {
+        var io = require('socket.io-client');
+        var socket = io.connect(url(), {reconnection: false});
 
-        var configureEmitFunction = function (socket) {
-          return function () {
-            var packet = {
-              pendingAcks: pendingAcknowledgements().flush(),
-              sentTimestamp: Date.now()
-            };
+        if (window().document.hasFocus()) {
+          socket.emit('unpause');
+        }
 
-            each(controls, function (control) {
-              extend(packet, control.getCurrentState());
-            });
+        socket.on('connect', function () {
+          each(onConnectCallbacks(), function (callback) {
+            callback();
+          });
+        });
+        socket.on('disconnect', function () {
+          each(onDisconnectCallbacks(), function (callback) {
+            callback();
+          });
+        });
+        socket.on('playerId', function (playerId) {
+          socket.playerId = playerId;
+        });
+        socket.on('initialState', function (state) {
+          each(onSetupCallbacks(), function (callback) {
+            callback(state);
+          });
+        });
+        socket.on('updateState', function (state) {
+          each(onPacketCallbacks(), function (callback) {
+            callback(state);
+          });
+        });
+        socket.on('error', function (data) {
+          each(onErrorCallbacks(), function (callback) {
+            callback(data);
+          });
+        });
 
-            socket.emit('input', packet);
-          };
-        };
+        $(window()).on('blur', function () { socket.emit('pause'); });
+        $(window()).on('focus', function () { socket.emit('unpause'); });
+        $(window()).on('mousedown', function () { socket.emit('unpause'); });
+        $(window()).on('mouseup', function () { socket.emit('unpause'); });
 
-        return {
-            connect: function () {
-              var display = displayBehaviour().Display();
+        each(inputModes(), function (inputMode) {
+          controls.push(inputMode.InputMode());
+        });
 
-              var io = require('socket.io-client');
-
-              var socket = io.connect(serverUrl() + gameMode() + '/primary', {reconnection: false});
-
-              if (window().document.hasFocus()) {
-                  socket.emit('unpause');
-              }
-
-              each(onConnectCallbacks(), function (callback) {
-                socket.on('connect', callback);
-              });
-              each(onDisconnectCallbacks(), function (callback) {
-                socket.on('disconnect', callback);
-              });
-
-              socket.on('playerId', function (playerId) {
-                socket.playerId = playerId;
-              });
-              socket.on('initialState', display.setup);
-              socket.on('updateState', display.update);
-              socket.on('error', function (data) { throw new Error(data); });
-
-              $(window()).on('blur', function () { socket.emit('pause'); });
-              $(window()).on('focus', function () { socket.emit('unpause'); });
-              $(window()).on('mousedown', function () { socket.emit('unpause'); });
-              $(window()).on('mouseup', function () { socket.emit('unpause'); });
-
-              each(inputModes(), function (inputMode) {
-                controls.push(inputMode.InputMode());
-              });
-
-              var id = setInterval(configureEmitFunction(socket), 1000 / 120);
-              socket.on('disconnect', function () {
-                clearInterval(id);
-              });
-            }
-        };
+        var id = setInterval(configureEmitFunction (socket), 1000 / 120);
+        socket.on('disconnect', function () {
+          clearInterval(id);
+        });
       }
     };
   }
 };
-},{"lodash":6,"socket.io-client":11,"zepto-browserify":61}],69:[function(require,module,exports){
+},{"lodash":6,"socket.io-client":11,"zepto-browserify":61}],74:[function(require,module,exports){
 'use strict';
 
 var clone = require('lodash').clone;
@@ -22554,7 +22645,7 @@ module.exports = {
         };
     }
 };
-},{"lodash":6}],70:[function(require,module,exports){
+},{"lodash":6}],75:[function(require,module,exports){
 'use strict';
 
 var isEqual = require('lodash').isEqual;
@@ -22571,7 +22662,7 @@ module.exports = {
     };
   }
 };
-},{"lodash":6}],71:[function(require,module,exports){
+},{"lodash":6}],76:[function(require,module,exports){
 'use strict';
 
 var each = require('lodash').each;
@@ -22754,7 +22845,7 @@ module.exports = {
     };
   }
 };
-},{"lodash":6}],72:[function(require,module,exports){
+},{"lodash":6}],77:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -22809,71 +22900,42 @@ module.exports = {
     };
   }
 };
-},{}],73:[function(require,module,exports){
+},{}],78:[function(require,module,exports){
 'use strict';
 
 var each = require('lodash').each;
 var reject = require('lodash').reject;
 
 module.exports = {
-  deps: ['Dimensions', 'View', 'StateTracker', 'PendingAcknowledgements', 'DefinePlugin'],
-  type: 'DisplayBehaviour',
-  func: function (dimensions, views, tracker, pendingAcknowledgements, define) {
+  deps: ['DefinePlugin'],
+  type: 'OnInitialise',
+  func: function (define) {
     var effects = [];
 
-    return {
-      Display: function () {
-        define()('RegisterEffect', function () {
-          return {
-            register: function (effect) {
-              effects.push(effect);
-            }
-          };
-        });
-
-        var onSetupState = function (state) {
-          tracker().updateState(state);
-
-          var dims = dimensions().get();
-
-          each(views(), function(view) {
-            view(dims);
+    return function () {
+      define()('OnEachFrame', function () {
+        return function (delta) {
+          each(effects, function (effect) {
+            effect.tick(delta);
           });
 
-          define()('OnEachFrame', function (delta) {
-            return function () {
-              each(effects, function (effect) {
-                effect.tick(delta);
-              });
-
-              effects = reject(effects, function (effect) {
-                return !effect.isAlive();
-              });
-            };
+          effects = reject(effects, function (effect) {
+            return !effect.isAlive();
           });
         };
+      });
 
-        var lastReceivedId = 0;
-        var onUpdateState = function (packet) {
-          pendingAcknowledgements().add(packet.id);
-
-          if (packet.id <= lastReceivedId) {
-            return;
-          }
-          lastReceivedId = packet.id;
-
-          tracker().updateState(packet.gameState);
-        };
-
+      define()('RegisterEffect', function () {
         return {
-          setup: onSetupState,
-          update: onUpdateState
+          register: function (effect) {
+            effects.push(effect);
+          }
         };
-      }
+      });
     };
   }
 };
-},{"lodash":6}],74:[function(require,module,exports){
+},{"lodash":6}],79:[function(require,module,exports){
 'use strict';
 
 var each = require('lodash').each;
@@ -22905,7 +22967,7 @@ module.exports = {
     };
     }
 };
-},{"lodash":6}],75:[function(require,module,exports){
+},{"lodash":6}],80:[function(require,module,exports){
 'use strict';
 
 var screenfull = require('screenfull');
@@ -22923,7 +22985,7 @@ module.exports = {
     };
   }
 };
-},{"screenfull":10,"zepto-browserify":61}],76:[function(require,module,exports){
+},{"screenfull":10,"zepto-browserify":61}],81:[function(require,module,exports){
 'use strict';
 
 var iconSize = 32;
@@ -22987,7 +23049,7 @@ module.exports = {
     };
   }
 };
-},{"zepto-browserify":61}],77:[function(require,module,exports){
+},{"zepto-browserify":61}],82:[function(require,module,exports){
 'use strict';
 
 module.exports = {
@@ -23023,7 +23085,7 @@ module.exports = {
     };
   }
 };
-},{"lodash":6,"zepto-browserify":61}],78:[function(require,module,exports){
+},{"lodash":6,"zepto-browserify":61}],83:[function(require,module,exports){
 'use strict';
 
 var numeral = require('numeral');
@@ -23050,7 +23112,7 @@ module.exports = {
     };
   }
 };
-},{"numeral":7,"zepto-browserify":61}],79:[function(require,module,exports){
+},{"numeral":7,"zepto-browserify":61}],84:[function(require,module,exports){
 'use strict';
 
 var each = require('lodash').each;
@@ -23081,7 +23143,7 @@ module.exports = {
     };
   }
 };
-},{"lodash":6,"zepto-browserify":61}],80:[function(require,module,exports){
+},{"lodash":6,"zepto-browserify":61}],85:[function(require,module,exports){
 arguments[4][61][0].apply(exports,arguments)
 },{"dup":61}]},{},[1]);
 

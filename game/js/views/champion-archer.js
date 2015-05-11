@@ -10,6 +10,7 @@ module.exports = {
     var input, context;
     var arrows;
     var $ = require('zepto-browserify').$;
+    var thePower = function (state) { return state.power; };
     var theArcher = function (state) { return state.archer; };
     var theEnemies = function (state) { return state.enemies; };
     var theArrows = function (state) { return state.arrows; };
@@ -38,6 +39,8 @@ module.exports = {
           context.save();
           context.clearRect(0, 0, canvas[0].width, canvas[0].height);
 
+          var power = tracker().get(thePower);
+
           var archer = tracker().get(theArcher);
           var arrows = tracker().get(theArrows);
           arrows.forEach(function(a) {
@@ -48,6 +51,13 @@ module.exports = {
             context.stroke();
             context.closePath();
           });
+
+          context.beginPath();
+          console.log(power);
+          context.rect(archer.aim.x - 10, archer.aim.y - 10, power, 10);
+          context.fill();
+          context.stroke();
+          context.closePath();
 
 
           var enemies = tracker().get(theEnemies);
