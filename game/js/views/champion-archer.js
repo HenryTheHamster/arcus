@@ -60,11 +60,21 @@ module.exports = {
           context.closePath();
 
 
+
+
           var enemies = tracker().get(theEnemies);
           enemies.forEach(function(e) {
             context.beginPath();
             context.arc(e.pos.x, e.pos.y, 20, 0, 2 * Math.PI, false);
             context.fill();
+            context.stroke();
+            context.closePath();
+          });
+
+          context.strokeStyle = 'green';
+          enemies.forEach(function(e) {
+            context.beginPath();
+            context.rect(e.pos.x - e.col.x, e.pos.y - e.col.y, e.col.x*2, e.col.y * 2, 0, 2 * Math.PI, false);
             context.stroke();
             context.closePath();
           });

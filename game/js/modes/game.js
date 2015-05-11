@@ -46,7 +46,7 @@ module.exports = {
               a.pos.y -= arrow_speed * a.vel.y * delta;
               a.pos.x += arrow_speed * a.vel.x * delta;
               for(var i = enemies.length - 1; i >= 0; i--) {
-                if(Math.abs(a.pos.x - enemies[i].pos.x) < 10.0 && Math.abs(a.pos.x - enemies[i].pos.x) < 10.0) {
+                if(Math.abs(a.pos.x - enemies[i].pos.x) < enemies[i].col.x && Math.abs(a.pos.y - enemies[i].pos.y) < enemies[i].col.y) {
                    enemies.splice(i, 1);
                 }
               }
@@ -66,6 +66,10 @@ module.exports = {
                         pos: {
                             x: 1200,
                             y: 500
+                        },
+                        col: {
+                            x: 10,
+                            y: 10
                         },
                         velocity: 100.0
                     });
