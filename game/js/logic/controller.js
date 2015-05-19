@@ -65,6 +65,9 @@ module.exports = {
                     powerInc: inc
                 }
             },
+            release: function(data) {
+                console.log(data);
+            },
             notFire: function(data) {
                 var get = state().get;
                 var pow = get('power');
@@ -84,7 +87,8 @@ module.exports = {
                             x: Math.cos(rot) * pow,
                             y: -Math.sin(rot) * pow
                         },
-                        rot: rot
+                        rot: rot,
+                        live: true
                     });
                     return {
                         power: 0,
