@@ -28,9 +28,11 @@ module.exports = {
       definePlugin()('ActionMap', function () {
         return {
           'cursor': [{target: controller().cursor}],
-          'button1': [{target: controller().release, onRelease: true}],
-          // 'button1': [{target: controller().fire, noEventKey: 'Fire'}],
-          'nothing': [{target: controller().notFire, noEventKey: 'Fire'}]
+          'button1': [
+            {target: controller().notFire, onRelease: true},
+            {target: controller().fire}
+          ],
+          // 'nothing': [{target: controller().notFire, noEventKey: 'Fire'}]
         };
       });
 
@@ -46,7 +48,7 @@ module.exports = {
               a.vel.y -= gravity * delta;
               a.pos.y -= arrow_speed * a.vel.y * delta;
               a.pos.x += arrow_speed * a.vel.x * delta;
-              a.rot = -Math.atan(a.vel.y/a.vel.x)
+              a.rot = -Math.atan(a.vel.y/a.vel.x);
               if(a.live) {
                 for(var i = enemies.length - 1; i >= 0; i--) {
                   if(Math.abs(a.pos.x - enemies[i].pos.x) < enemies[i].col.x && Math.abs(a.pos.y - enemies[i].pos.y) < enemies[i].col.y) {
@@ -61,7 +63,7 @@ module.exports = {
             } else {
               a.live = false;
             }
-          }); 
+          });
 
           if(attackCooldown > 0) {
             attackCooldown = attackCooldown - 0.1;

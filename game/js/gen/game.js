@@ -8,7 +8,7 @@ entryPoint.loadDefaults();
 entryPoint.load(require('./views/champion-archer'));
 entryPoint.run();
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./views/champion-archer":2,"ensemblejs-client":63}],2:[function(require,module,exports){
+},{"./views/champion-archer":2,"ensemblejs-client":62}],2:[function(require,module,exports){
 'use strict';
 
 
@@ -123,7 +123,7 @@ module.exports = {
     }
   }
 }
-},{"zepto-browserify":85}],3:[function(require,module,exports){
+},{"zepto-browserify":84}],3:[function(require,module,exports){
 
 },{}],4:[function(require,module,exports){
 (function (process){
@@ -417,7 +417,7 @@ process.umask = function() { return 0; };
 (function (global){
 /**
  * @license
- * lodash 3.8.0 (Custom Build) <https://lodash.com/>
+ * lodash 3.9.1 (Custom Build) <https://lodash.com/>
  * Build: `lodash modern -d -o ./index.js`
  * Copyright 2012-2015 The Dojo Foundation <http://dojofoundation.org/>
  * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
@@ -430,7 +430,7 @@ process.umask = function() { return 0; };
   var undefined;
 
   /** Used as the semantic version number. */
-  var VERSION = '3.8.0';
+  var VERSION = '3.9.1';
 
   /** Used to compose bitmasks for wrapper metadata. */
   var BIND_FLAG = 1,
@@ -692,7 +692,7 @@ process.umask = function() { return 0; };
   /**
    * Used as a reference to the global object.
    *
-   * The `this` value is used if it is the global object to avoid Greasemonkey's
+   * The `this` value is used if it's the global object to avoid Greasemonkey's
    * restricted `window` object, otherwise the `window` object is used.
    */
   var root = freeGlobal || ((freeWindow !== (this && this.window)) && freeWindow) || freeSelf || this;
@@ -702,19 +702,28 @@ process.umask = function() { return 0; };
    * sorts them in ascending order without guaranteeing a stable sort.
    *
    * @private
-   * @param {*} value The value to compare to `other`.
-   * @param {*} other The value to compare to `value`.
+   * @param {*} value The value to compare.
+   * @param {*} other The other value to compare.
    * @returns {number} Returns the sort order indicator for `value`.
    */
   function baseCompareAscending(value, other) {
     if (value !== other) {
-      var valIsReflexive = value === value,
+      var valIsNull = value === null,
+          valIsUndef = value === undefined,
+          valIsReflexive = value === value;
+
+      var othIsNull = other === null,
+          othIsUndef = other === undefined,
           othIsReflexive = other === other;
 
-      if (value > other || !valIsReflexive || (value === undefined && othIsReflexive)) {
+      if ((value > other && !othIsNull) || !valIsReflexive ||
+          (valIsNull && !othIsUndef && othIsReflexive) ||
+          (valIsUndef && othIsReflexive)) {
         return 1;
       }
-      if (value < other || !othIsReflexive || (other === undefined && valIsReflexive)) {
+      if ((value < other && !valIsNull) || !othIsReflexive ||
+          (othIsNull && !valIsUndef && valIsReflexive) ||
+          (othIsUndef && valIsReflexive)) {
         return -1;
       }
     }
@@ -782,7 +791,7 @@ process.umask = function() { return 0; };
   }
 
   /**
-   * Converts `value` to a string if it is not one. An empty string is returned
+   * Converts `value` to a string if it's not one. An empty string is returned
    * for `null` or `undefined` values.
    *
    * @private
@@ -794,17 +803,6 @@ process.umask = function() { return 0; };
       return value;
     }
     return value == null ? '' : (value + '');
-  }
-
-  /**
-   * Used by `_.max` and `_.min` as the default callback for string values.
-   *
-   * @private
-   * @param {string} string The string to inspect.
-   * @returns {number} Returns the code unit of the first character of the string.
-   */
-  function charAtCallback(string) {
-    return string.charCodeAt(0);
   }
 
   /**
@@ -1127,7 +1125,7 @@ process.umask = function() { return 0; };
         stringProto = String.prototype;
 
     /** Used to detect DOM support. */
-    var document = (document = context.window) && document.document;
+    var document = (document = context.window) ? document.document : null;
 
     /** Used to resolve the decompiled source of functions. */
     var fnToString = Function.prototype.toString;
@@ -1149,26 +1147,23 @@ process.umask = function() { return 0; };
 
     /** Used to detect if a method is native. */
     var reIsNative = RegExp('^' +
-      escapeRegExp(objToString)
-      .replace(/toString|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$'
+      escapeRegExp(fnToString.call(hasOwnProperty))
+      .replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$'
     );
 
     /** Native method references. */
-    var ArrayBuffer = isNative(ArrayBuffer = context.ArrayBuffer) && ArrayBuffer,
-        bufferSlice = isNative(bufferSlice = ArrayBuffer && new ArrayBuffer(0).slice) && bufferSlice,
+    var ArrayBuffer = getNative(context, 'ArrayBuffer'),
+        bufferSlice = getNative(ArrayBuffer && new ArrayBuffer(0), 'slice'),
         ceil = Math.ceil,
         clearTimeout = context.clearTimeout,
         floor = Math.floor,
-        getOwnPropertySymbols = isNative(getOwnPropertySymbols = Object.getOwnPropertySymbols) && getOwnPropertySymbols,
-        getPrototypeOf = isNative(getPrototypeOf = Object.getPrototypeOf) && getPrototypeOf,
+        getPrototypeOf = getNative(Object, 'getPrototypeOf'),
         push = arrayProto.push,
-        preventExtensions = isNative(preventExtensions = Object.preventExtensions) && preventExtensions,
-        propertyIsEnumerable = objectProto.propertyIsEnumerable,
-        Set = isNative(Set = context.Set) && Set,
+        Set = getNative(context, 'Set'),
         setTimeout = context.setTimeout,
         splice = arrayProto.splice,
-        Uint8Array = isNative(Uint8Array = context.Uint8Array) && Uint8Array,
-        WeakMap = isNative(WeakMap = context.WeakMap) && WeakMap;
+        Uint8Array = getNative(context, 'Uint8Array'),
+        WeakMap = getNative(context, 'WeakMap');
 
     /** Used to clone array buffers. */
     var Float64Array = (function() {
@@ -1176,53 +1171,29 @@ process.umask = function() { return 0; };
       // where the array buffer's `byteLength` is not a multiple of the typed
       // array's `BYTES_PER_ELEMENT`.
       try {
-        var func = isNative(func = context.Float64Array) && func,
+        var func = getNative(context, 'Float64Array'),
             result = new func(new ArrayBuffer(10), 0, 1) && func;
       } catch(e) {}
-      return result;
-    }());
-
-    /** Used as `baseAssign`. */
-    var nativeAssign = (function() {
-      // Avoid `Object.assign` in Firefox 34-37 which have an early implementation
-      // with a now defunct try/catch behavior. See https://bugzilla.mozilla.org/show_bug.cgi?id=1103344
-      // for more details.
-      //
-      // Use `Object.preventExtensions` on a plain object instead of simply using
-      // `Object('x')` because Chrome and IE fail to throw an error when attempting
-      // to assign values to readonly indexes of strings.
-      var func = preventExtensions && isNative(func = Object.assign) && func;
-      try {
-        if (func) {
-          var object = preventExtensions({ '1': 0 });
-          object[0] = 1;
-        }
-      } catch(e) {
-        // Only attempt in strict mode.
-        try { func(object, 'xo'); } catch(e) {}
-        return !object[1] && func;
-      }
-      return false;
+      return result || null;
     }());
 
     /* Native method references for those with the same name as other `lodash` methods. */
-    var nativeIsArray = isNative(nativeIsArray = Array.isArray) && nativeIsArray,
-        nativeCreate = isNative(nativeCreate = Object.create) && nativeCreate,
+    var nativeCreate = getNative(Object, 'create'),
+        nativeIsArray = getNative(Array, 'isArray'),
         nativeIsFinite = context.isFinite,
-        nativeKeys = isNative(nativeKeys = Object.keys) && nativeKeys,
+        nativeKeys = getNative(Object, 'keys'),
         nativeMax = Math.max,
         nativeMin = Math.min,
-        nativeNow = isNative(nativeNow = Date.now) && nativeNow,
-        nativeNumIsFinite = isNative(nativeNumIsFinite = Number.isFinite) && nativeNumIsFinite,
+        nativeNow = getNative(Date, 'now'),
+        nativeNumIsFinite = getNative(Number, 'isFinite'),
         nativeParseInt = context.parseInt,
         nativeRandom = Math.random;
 
     /** Used as references for `-Infinity` and `Infinity`. */
-    var NEGATIVE_INFINITY = Number.NEGATIVE_INFINITY,
-        POSITIVE_INFINITY = Number.POSITIVE_INFINITY;
+    var POSITIVE_INFINITY = Number.POSITIVE_INFINITY;
 
     /** Used as references for the maximum length and index of an array. */
-    var MAX_ARRAY_LENGTH = Math.pow(2, 32) - 1,
+    var MAX_ARRAY_LENGTH = 4294967295,
         MAX_ARRAY_INDEX = MAX_ARRAY_LENGTH - 1,
         HALF_MAX_ARRAY_LENGTH = MAX_ARRAY_LENGTH >>> 1;
 
@@ -1233,7 +1204,7 @@ process.umask = function() { return 0; };
      * Used as the [maximum length](https://people.mozilla.org/~jorendorff/es6-draft.html#sec-number.max_safe_integer)
      * of an array-like value.
      */
-    var MAX_SAFE_INTEGER = Math.pow(2, 53) - 1;
+    var MAX_SAFE_INTEGER = 9007199254740991;
 
     /** Used to store function metadata. */
     var metaMap = WeakMap && new WeakMap;
@@ -1280,30 +1251,31 @@ process.umask = function() { return 0; };
      * `filter`, `flatten`, `flattenDeep`, `flow`, `flowRight`, `forEach`,
      * `forEachRight`, `forIn`, `forInRight`, `forOwn`, `forOwnRight`, `functions`,
      * `groupBy`, `indexBy`, `initial`, `intersection`, `invert`, `invoke`, `keys`,
-     * `keysIn`, `map`, `mapValues`, `matches`, `matchesProperty`, `memoize`,
-     * `merge`, `mixin`, `negate`, `omit`, `once`, `pairs`, `partial`, `partialRight`,
-     * `partition`, `pick`, `plant`, `pluck`, `property`, `propertyOf`, `pull`,
-     * `pullAt`, `push`, `range`, `rearg`, `reject`, `remove`, `rest`, `reverse`,
-     * `shuffle`, `slice`, `sort`, `sortBy`, `sortByAll`, `sortByOrder`, `splice`,
-     * `spread`, `take`, `takeRight`, `takeRightWhile`, `takeWhile`, `tap`,
-     * `throttle`, `thru`, `times`, `toArray`, `toPlainObject`, `transform`,
-     * `union`, `uniq`, `unshift`, `unzip`, `values`, `valuesIn`, `where`,
-     * `without`, `wrap`, `xor`, `zip`, and `zipObject`
+     * `keysIn`, `map`, `mapKeys`, `mapValues`, `matches`, `matchesProperty`,
+     * `memoize`, `merge`, `method`, `methodOf`, `mixin`, `negate`, `omit`, `once`,
+     * `pairs`, `partial`, `partialRight`, `partition`, `pick`, `plant`, `pluck`,
+     * `property`, `propertyOf`, `pull`, `pullAt`, `push`, `range`, `rearg`,
+     * `reject`, `remove`, `rest`, `restParam`, `reverse`, `set`, `shuffle`,
+     * `slice`, `sort`, `sortBy`, `sortByAll`, `sortByOrder`, `splice`, `spread`,
+     * `take`, `takeRight`, `takeRightWhile`, `takeWhile`, `tap`, `throttle`,
+     * `thru`, `times`, `toArray`, `toPlainObject`, `transform`, `union`, `uniq`,
+     * `unshift`, `unzip`, `unzipWith`, `values`, `valuesIn`, `where`, `without`,
+     * `wrap`, `xor`, `zip`, `zipObject`, `zipWith`
      *
      * The wrapper methods that are **not** chainable by default are:
      * `add`, `attempt`, `camelCase`, `capitalize`, `clone`, `cloneDeep`, `deburr`,
      * `endsWith`, `escape`, `escapeRegExp`, `every`, `find`, `findIndex`, `findKey`,
-     * `findLast`, `findLastIndex`, `findLastKey`, `findWhere`, `first`, `has`,
-     * `identity`, `includes`, `indexOf`, `inRange`, `isArguments`, `isArray`,
-     * `isBoolean`, `isDate`, `isElement`, `isEmpty`, `isEqual`, `isError`, `isFinite`
-     * `isFunction`, `isMatch`, `isNative`, `isNaN`, `isNull`, `isNumber`, `isObject`,
-     * `isPlainObject`, `isRegExp`, `isString`, `isUndefined`, `isTypedArray`,
-     * `join`, `kebabCase`, `last`, `lastIndexOf`, `max`, `min`, `noConflict`,
-     * `noop`, `now`, `pad`, `padLeft`, `padRight`, `parseInt`, `pop`, `random`,
-     * `reduce`, `reduceRight`, `repeat`, `result`, `runInContext`, `shift`, `size`,
-     * `snakeCase`, `some`, `sortedIndex`, `sortedLastIndex`, `startCase`, `startsWith`,
-     * `sum`, `template`, `trim`, `trimLeft`, `trimRight`, `trunc`, `unescape`,
-     * `uniqueId`, `value`, and `words`
+     * `findLast`, `findLastIndex`, `findLastKey`, `findWhere`, `first`, `get`,
+     * `gt`, `gte`, `has`, `identity`, `includes`, `indexOf`, `inRange`, `isArguments`,
+     * `isArray`, `isBoolean`, `isDate`, `isElement`, `isEmpty`, `isEqual`, `isError`,
+     * `isFinite` `isFunction`, `isMatch`, `isNative`, `isNaN`, `isNull`, `isNumber`,
+     * `isObject`, `isPlainObject`, `isRegExp`, `isString`, `isUndefined`,
+     * `isTypedArray`, `join`, `kebabCase`, `last`, `lastIndexOf`, `lt`, `lte`,
+     * `max`, `min`, `noConflict`, `noop`, `now`, `pad`, `padLeft`, `padRight`,
+     * `parseInt`, `pop`, `random`, `reduce`, `reduceRight`, `repeat`, `result`,
+     * `runInContext`, `shift`, `size`, `snakeCase`, `some`, `sortedIndex`,
+     * `sortedLastIndex`, `startCase`, `startsWith`, `sum`, `template`, `trim`,
+     * `trimLeft`, `trimRight`, `trunc`, `unescape`, `uniqueId`, `value`, and `words`
      *
      * The wrapper method `sample` will return a wrapped value when `n` is provided,
      * otherwise an unwrapped value is returned.
@@ -1380,30 +1352,11 @@ process.umask = function() { return 0; };
 
     (function(x) {
       var Ctor = function() { this.x = x; },
-          args = arguments,
           object = { '0': x, 'length': x },
           props = [];
 
       Ctor.prototype = { 'valueOf': x, 'y': x };
       for (var key in new Ctor) { props.push(key); }
-
-      /**
-       * Detect if functions can be decompiled by `Function#toString`
-       * (all but Firefox OS certified apps, older Opera mobile browsers, and
-       * the PlayStation 3; forced `false` for Windows 8 apps).
-       *
-       * @memberOf _.support
-       * @type boolean
-       */
-      support.funcDecomp = /\bthis\b/.test(function() { return this; });
-
-      /**
-       * Detect if `Function#name` is supported (all but IE).
-       *
-       * @memberOf _.support
-       * @type boolean
-       */
-      support.funcNames = typeof Function.name == 'string';
 
       /**
        * Detect if the DOM is supported.
@@ -1415,24 +1368,6 @@ process.umask = function() { return 0; };
         support.dom = document.createDocumentFragment().nodeType === 11;
       } catch(e) {
         support.dom = false;
-      }
-
-      /**
-       * Detect if `arguments` object indexes are non-enumerable.
-       *
-       * In Firefox < 4, IE < 9, PhantomJS, and Safari < 5.1 `arguments` object
-       * indexes are non-enumerable. Chrome < 25 and Node.js < 0.11.0 treat
-       * `arguments` object indexes as non-enumerable and fail `hasOwnProperty`
-       * checks for indexes that exceed the number of function parameters and
-       * whose associated argument values are `0`.
-       *
-       * @memberOf _.support
-       * @type boolean
-       */
-      try {
-        support.nonEnumArgs = !propertyIsEnumerable.call(args, 1);
-      } catch(e) {
-        support.nonEnumArgs = true;
       }
     }(1, 0));
 
@@ -1825,6 +1760,35 @@ process.umask = function() { return 0; };
     }
 
     /**
+     * A specialized version of `baseExtremum` for arrays whichs invokes `iteratee`
+     * with one argument: (value).
+     *
+     * @private
+     * @param {Array} array The array to iterate over.
+     * @param {Function} iteratee The function invoked per iteration.
+     * @param {Function} comparator The function used to compare values.
+     * @param {*} exValue The initial extremum value.
+     * @returns {*} Returns the extremum value.
+     */
+    function arrayExtremum(array, iteratee, comparator, exValue) {
+      var index = -1,
+          length = array.length,
+          computed = exValue,
+          result = computed;
+
+      while (++index < length) {
+        var value = array[index],
+            current = +iteratee(value);
+
+        if (comparator(current, computed)) {
+          computed = current;
+          result = value;
+        }
+      }
+      return result;
+    }
+
+    /**
      * A specialized version of `_.filter` for arrays without support for callback
      * shorthands and `this` binding.
      *
@@ -1864,48 +1828,6 @@ process.umask = function() { return 0; };
 
       while (++index < length) {
         result[index] = iteratee(array[index], index, array);
-      }
-      return result;
-    }
-
-    /**
-     * A specialized version of `_.max` for arrays without support for iteratees.
-     *
-     * @private
-     * @param {Array} array The array to iterate over.
-     * @returns {*} Returns the maximum value.
-     */
-    function arrayMax(array) {
-      var index = -1,
-          length = array.length,
-          result = NEGATIVE_INFINITY;
-
-      while (++index < length) {
-        var value = array[index];
-        if (value > result) {
-          result = value;
-        }
-      }
-      return result;
-    }
-
-    /**
-     * A specialized version of `_.min` for arrays without support for iteratees.
-     *
-     * @private
-     * @param {Array} array The array to iterate over.
-     * @returns {*} Returns the minimum value.
-     */
-    function arrayMin(array) {
-      var index = -1,
-          length = array.length,
-          result = POSITIVE_INFINITY;
-
-      while (++index < length) {
-        var value = array[index];
-        if (value < result) {
-          result = value;
-        }
       }
       return result;
     }
@@ -2040,10 +1962,8 @@ process.umask = function() { return 0; };
      * @returns {Object} Returns `object`.
      */
     function assignWith(object, source, customizer) {
-      var props = keys(source);
-      push.apply(props, getSymbols(source));
-
       var index = -1,
+          props = keys(source),
           length = props.length;
 
       while (++index < length) {
@@ -2068,11 +1988,11 @@ process.umask = function() { return 0; };
      * @param {Object} source The source object.
      * @returns {Object} Returns `object`.
      */
-    var baseAssign = nativeAssign || function(object, source) {
+    function baseAssign(object, source) {
       return source == null
         ? object
-        : baseCopy(source, getSymbols(source), baseCopy(source, keys(source), object));
-    };
+        : baseCopy(source, keys(source), object);
+    }
 
     /**
      * The base implementation of `_.at` without support for string collections
@@ -2087,7 +2007,7 @@ process.umask = function() { return 0; };
       var index = -1,
           isNil = collection == null,
           isArr = !isNil && isArrayLike(collection),
-          length = isArr && collection.length,
+          length = isArr ? collection.length : 0,
           propsLength = props.length,
           result = Array(propsLength);
 
@@ -2228,14 +2148,14 @@ process.umask = function() { return 0; };
      * @returns {Object} Returns the new object.
      */
     var baseCreate = (function() {
-      function Object() {}
+      function object() {}
       return function(prototype) {
         if (isObject(prototype)) {
-          Object.prototype = prototype;
-          var result = new Object;
-          Object.prototype = null;
+          object.prototype = prototype;
+          var result = new object;
+          object.prototype = null;
         }
-        return result || context.Object();
+        return result || {};
       };
     }());
 
@@ -2340,6 +2260,32 @@ process.umask = function() { return 0; };
       baseEach(collection, function(value, index, collection) {
         result = !!predicate(value, index, collection);
         return result;
+      });
+      return result;
+    }
+
+    /**
+     * Gets the extremum value of `collection` invoking `iteratee` for each value
+     * in `collection` to generate the criterion by which the value is ranked.
+     * The `iteratee` is invoked with three arguments: (value, index|key, collection).
+     *
+     * @private
+     * @param {Array|Object|string} collection The collection to iterate over.
+     * @param {Function} iteratee The function invoked per iteration.
+     * @param {Function} comparator The function used to compare values.
+     * @param {*} exValue The initial extremum value.
+     * @returns {*} Returns the extremum value.
+     */
+    function baseExtremum(collection, iteratee, comparator, exValue) {
+      var computed = exValue,
+          result = computed;
+
+      baseEach(collection, function(value, index, collection) {
+        var current = +iteratee(value, index, collection);
+        if (comparator(current, computed) || (current === exValue && current === result)) {
+          computed = current;
+          result = value;
+        }
       });
       return result;
     }
@@ -2560,11 +2506,11 @@ process.umask = function() { return 0; };
       if (pathKey !== undefined && pathKey in toObject(object)) {
         path = [pathKey];
       }
-      var index = -1,
+      var index = 0,
           length = path.length;
 
-      while (object != null && ++index < length) {
-        object = object[path[index]];
+      while (object != null && index < length) {
+        object = object[path[index++]];
       }
       return (index && index == length) ? object : undefined;
     }
@@ -2583,17 +2529,10 @@ process.umask = function() { return 0; };
      * @returns {boolean} Returns `true` if the values are equivalent, else `false`.
      */
     function baseIsEqual(value, other, customizer, isLoose, stackA, stackB) {
-      // Exit early for identical values.
       if (value === other) {
         return true;
       }
-      var valType = typeof value,
-          othType = typeof other;
-
-      // Exit early for unlike primitive values.
-      if ((valType != 'function' && valType != 'object' && othType != 'function' && othType != 'object') ||
-          value == null || other == null) {
-        // Return `false` unless both values are `NaN`.
+      if (value == null || other == null || (!isObject(value) && !isObject(other))) {
         return value !== value && other !== other;
       }
       return baseIsEqualDeep(value, other, baseIsEqual, customizer, isLoose, stackA, stackB);
@@ -2644,11 +2583,11 @@ process.umask = function() { return 0; };
         return equalByTag(object, other, objTag);
       }
       if (!isLoose) {
-        var valWrapped = objIsObj && hasOwnProperty.call(object, '__wrapped__'),
-            othWrapped = othIsObj && hasOwnProperty.call(other, '__wrapped__');
+        var objIsWrapped = objIsObj && hasOwnProperty.call(object, '__wrapped__'),
+            othIsWrapped = othIsObj && hasOwnProperty.call(other, '__wrapped__');
 
-        if (valWrapped || othWrapped) {
-          return equalFunc(valWrapped ? object.value() : object, othWrapped ? other.value() : other, customizer, isLoose, stackA, stackB);
+        if (objIsWrapped || othIsWrapped) {
+          return equalFunc(objIsWrapped ? object.value() : object, othIsWrapped ? other.value() : other, customizer, isLoose, stackA, stackB);
         }
       }
       if (!isSameTag) {
@@ -2683,41 +2622,43 @@ process.umask = function() { return 0; };
      *
      * @private
      * @param {Object} object The object to inspect.
-     * @param {Array} props The source property names to match.
-     * @param {Array} values The source values to match.
-     * @param {Array} strictCompareFlags Strict comparison flags for source values.
+     * @param {Array} matchData The propery names, values, and compare flags to match.
      * @param {Function} [customizer] The function to customize comparing objects.
      * @returns {boolean} Returns `true` if `object` is a match, else `false`.
      */
-    function baseIsMatch(object, props, values, strictCompareFlags, customizer) {
-      var index = -1,
-          length = props.length,
+    function baseIsMatch(object, matchData, customizer) {
+      var index = matchData.length,
+          length = index,
           noCustomizer = !customizer;
 
-      while (++index < length) {
-        if ((noCustomizer && strictCompareFlags[index])
-              ? values[index] !== object[props[index]]
-              : !(props[index] in object)
+      if (object == null) {
+        return !length;
+      }
+      object = toObject(object);
+      while (index--) {
+        var data = matchData[index];
+        if ((noCustomizer && data[2])
+              ? data[1] !== object[data[0]]
+              : !(data[0] in object)
             ) {
           return false;
         }
       }
-      index = -1;
       while (++index < length) {
-        var key = props[index],
+        data = matchData[index];
+        var key = data[0],
             objValue = object[key],
-            srcValue = values[index];
+            srcValue = data[1];
 
-        if (noCustomizer && strictCompareFlags[index]) {
-          var result = objValue !== undefined || (key in object);
-        } else {
-          result = customizer ? customizer(objValue, srcValue, key) : undefined;
-          if (result === undefined) {
-            result = baseIsEqual(srcValue, objValue, customizer, true);
+        if (noCustomizer && data[2]) {
+          if (objValue === undefined && !(key in object)) {
+            return false;
           }
-        }
-        if (!result) {
-          return false;
+        } else {
+          var result = customizer ? customizer(objValue, srcValue, key) : undefined;
+          if (!(result === undefined ? baseIsEqual(srcValue, objValue, customizer, true) : result)) {
+            return false;
+          }
         }
       }
       return true;
@@ -2750,35 +2691,20 @@ process.umask = function() { return 0; };
      * @returns {Function} Returns the new function.
      */
     function baseMatches(source) {
-      var props = keys(source),
-          length = props.length;
+      var matchData = getMatchData(source);
+      if (matchData.length == 1 && matchData[0][2]) {
+        var key = matchData[0][0],
+            value = matchData[0][1];
 
-      if (!length) {
-        return constant(true);
-      }
-      if (length == 1) {
-        var key = props[0],
-            value = source[key];
-
-        if (isStrictComparable(value)) {
-          return function(object) {
-            if (object == null) {
-              return false;
-            }
-            return object[key] === value && (value !== undefined || (key in toObject(object)));
-          };
-        }
-      }
-      var values = Array(length),
-          strictCompareFlags = Array(length);
-
-      while (length--) {
-        value = source[props[length]];
-        values[length] = value;
-        strictCompareFlags[length] = isStrictComparable(value);
+        return function(object) {
+          if (object == null) {
+            return false;
+          }
+          return object[key] === value && (value !== undefined || (key in toObject(object)));
+        };
       }
       return function(object) {
-        return object != null && baseIsMatch(toObject(object), props, values, strictCompareFlags);
+        return baseIsMatch(object, matchData);
       };
     }
 
@@ -2788,12 +2714,12 @@ process.umask = function() { return 0; };
      *
      * @private
      * @param {string} path The path of the property to get.
-     * @param {*} value The value to compare.
+     * @param {*} srcValue The value to compare.
      * @returns {Function} Returns the new function.
      */
-    function baseMatchesProperty(path, value) {
+    function baseMatchesProperty(path, srcValue) {
       var isArr = isArray(path),
-          isCommon = isKey(path) && isStrictComparable(value),
+          isCommon = isKey(path) && isStrictComparable(srcValue),
           pathKey = (path + '');
 
       path = toPath(path);
@@ -2811,9 +2737,9 @@ process.umask = function() { return 0; };
           key = last(path);
           object = toObject(object);
         }
-        return object[key] === value
-          ? (value !== undefined || (key in object))
-          : baseIsEqual(value, object[key], null, true);
+        return object[key] === srcValue
+          ? (srcValue !== undefined || (key in object))
+          : baseIsEqual(srcValue, object[key], undefined, true);
       };
     }
 
@@ -2833,11 +2759,9 @@ process.umask = function() { return 0; };
       if (!isObject(object)) {
         return object;
       }
-      var isSrcArr = isArrayLike(source) && (isArray(source) || isTypedArray(source));
-      if (!isSrcArr) {
-        var props = keys(source);
-        push.apply(props, getSymbols(source));
-      }
+      var isSrcArr = isArrayLike(source) && (isArray(source) || isTypedArray(source)),
+          props = isSrcArr ? null : keys(source);
+
       arrayEach(props || source, function(srcValue, key) {
         if (props) {
           key = srcValue;
@@ -2856,7 +2780,7 @@ process.umask = function() { return 0; };
           if (isCommon) {
             result = srcValue;
           }
-          if ((isSrcArr || result !== undefined) &&
+          if ((result !== undefined || (isSrcArr && !(key in object))) &&
               (isCommon || (result === result ? (result !== value) : (value === value)))) {
             object[key] = result;
           }
@@ -2963,7 +2887,7 @@ process.umask = function() { return 0; };
     function basePullAt(array, indexes) {
       var length = array ? indexes.length : 0;
       while (length--) {
-        var index = parseFloat(indexes[length]);
+        var index = indexes[length];
         if (index != previous && isIndex(index)) {
           var previous = index;
           splice.call(array, index, 1);
@@ -3276,7 +3200,7 @@ process.umask = function() { return 0; };
           var mid = (low + high) >>> 1,
               computed = array[mid];
 
-          if (retHighest ? (computed <= value) : (computed < value)) {
+          if ((retHighest ? (computed <= value) : (computed < value)) && computed !== null) {
             low = mid + 1;
           } else {
             high = mid;
@@ -3306,17 +3230,23 @@ process.umask = function() { return 0; };
       var low = 0,
           high = array ? array.length : 0,
           valIsNaN = value !== value,
+          valIsNull = value === null,
           valIsUndef = value === undefined;
 
       while (low < high) {
         var mid = floor((low + high) / 2),
             computed = iteratee(array[mid]),
+            isDef = computed !== undefined,
             isReflexive = computed === computed;
 
         if (valIsNaN) {
           var setLow = isReflexive || retHighest;
+        } else if (valIsNull) {
+          setLow = isReflexive && isDef && (retHighest || computed != null);
         } else if (valIsUndef) {
-          setLow = isReflexive && (retHighest || computed !== undefined);
+          setLow = isReflexive && (retHighest || isDef);
+        } else if (computed == null) {
+          setLow = false;
         } else {
           setLow = retHighest ? (computed <= value) : (computed < value);
         }
@@ -3506,19 +3436,19 @@ process.umask = function() { return 0; };
       return restParam(function(object, sources) {
         var index = -1,
             length = object == null ? 0 : sources.length,
-            customizer = length > 2 && sources[length - 2],
-            guard = length > 2 && sources[2],
-            thisArg = length > 1 && sources[length - 1];
+            customizer = length > 2 ? sources[length - 2] : undefined,
+            guard = length > 2 ? sources[2] : undefined,
+            thisArg = length > 1 ? sources[length - 1] : undefined;
 
         if (typeof customizer == 'function') {
           customizer = bindCallback(customizer, thisArg, 5);
           length -= 2;
         } else {
-          customizer = typeof thisArg == 'function' ? thisArg : null;
+          customizer = typeof thisArg == 'function' ? thisArg : undefined;
           length -= (customizer ? 1 : 0);
         }
         if (guard && isIterateeCall(sources[0], sources[1], guard)) {
-          customizer = length < 3 ? null : customizer;
+          customizer = length < 3 ? undefined : customizer;
           length = 1;
         }
         while (++index < length) {
@@ -3643,8 +3573,20 @@ process.umask = function() { return 0; };
      */
     function createCtorWrapper(Ctor) {
       return function() {
+        // Use a `switch` statement to work with class constructors.
+        // See https://people.mozilla.org/~jorendorff/es6-draft.html#sec-ecmascript-function-objects-call-thisargument-argumentslist
+        // for more details.
+        var args = arguments;
+        switch (args.length) {
+          case 0: return new Ctor;
+          case 1: return new Ctor(args[0]);
+          case 2: return new Ctor(args[0], args[1]);
+          case 3: return new Ctor(args[0], args[1], args[2]);
+          case 4: return new Ctor(args[0], args[1], args[2], args[3]);
+          case 5: return new Ctor(args[0], args[1], args[2], args[3], args[4]);
+        }
         var thisBinding = baseCreate(Ctor.prototype),
-            result = Ctor.apply(thisBinding, arguments);
+            result = Ctor.apply(thisBinding, args);
 
         // Mimic the constructor's `return` behavior.
         // See https://es5.github.io/#x13.2.2 for more details.
@@ -3675,32 +3617,24 @@ process.umask = function() { return 0; };
      * Creates a `_.max` or `_.min` function.
      *
      * @private
-     * @param {Function} arrayFunc The function to get the extremum value from an array.
-     * @param {boolean} [isMin] Specify returning the minimum, instead of the maximum,
-     *  extremum value.
+     * @param {Function} comparator The function used to compare values.
+     * @param {*} exValue The initial extremum value.
      * @returns {Function} Returns the new extremum function.
      */
-    function createExtremum(arrayFunc, isMin) {
+    function createExtremum(comparator, exValue) {
       return function(collection, iteratee, thisArg) {
         if (thisArg && isIterateeCall(collection, iteratee, thisArg)) {
           iteratee = null;
         }
-        var func = getCallback(),
-            noIteratee = iteratee == null;
-
-        if (!(func === baseCallback && noIteratee)) {
-          noIteratee = false;
-          iteratee = func(iteratee, thisArg, 3);
-        }
-        if (noIteratee) {
-          var isArr = isArray(collection);
-          if (!isArr && isString(collection)) {
-            iteratee = charAtCallback;
-          } else {
-            return arrayFunc(isArr ? collection : toIterable(collection));
+        iteratee = getCallback(iteratee, thisArg, 3);
+        if (iteratee.length == 1) {
+          collection = toIterable(collection);
+          var result = arrayExtremum(collection, iteratee, comparator, exValue);
+          if (!(collection.length && result === exValue)) {
+            return result;
           }
         }
-        return extremumBy(collection, iteratee, isMin);
+        return baseExtremum(collection, iteratee, comparator, exValue);
       };
     }
 
@@ -3763,11 +3697,8 @@ process.umask = function() { return 0; };
      */
     function createFlow(fromRight) {
       return function() {
-        var length = arguments.length;
-        if (!length) {
-          return function() { return arguments[0]; };
-        }
         var wrapper,
+            length = arguments.length,
             index = fromRight ? length : -1,
             leftIndex = 0,
             funcs = Array(length);
@@ -3777,15 +3708,17 @@ process.umask = function() { return 0; };
           if (typeof func != 'function') {
             throw new TypeError(FUNC_ERROR_TEXT);
           }
-          var funcName = wrapper ? '' : getFuncName(func);
-          wrapper = funcName == 'wrapper' ? new LodashWrapper([]) : wrapper;
+          if (!wrapper && LodashWrapper.prototype.thru && getFuncName(func) == 'wrapper') {
+            wrapper = new LodashWrapper([]);
+          }
         }
         index = wrapper ? -1 : length;
         while (++index < length) {
           func = funcs[index];
-          funcName = getFuncName(func);
 
-          var data = funcName == 'wrapper' ? getData(func) : null;
+          var funcName = getFuncName(func),
+              data = funcName == 'wrapper' ? getData(func) : null;
+
           if (data && isLaziable(data[0]) && data[1] == (ARY_FLAG | CURRY_FLAG | PARTIAL_FLAG | REARG_FLAG) && !data[4].length && data[9] == 1) {
             wrapper = wrapper[getFuncName(data[0])].apply(wrapper, data[3]);
           } else {
@@ -3798,7 +3731,7 @@ process.umask = function() { return 0; };
             return wrapper.plant(args[0]).value();
           }
           var index = 0,
-              result = funcs[index].apply(this, args);
+              result = length ? funcs[index].apply(this, args) : args[0];
 
           while (++index < length) {
             result = funcs[index].call(this, result);
@@ -3947,10 +3880,8 @@ process.umask = function() { return 0; };
           isBindKey = bitmask & BIND_KEY_FLAG,
           isCurry = bitmask & CURRY_FLAG,
           isCurryBound = bitmask & CURRY_BOUND_FLAG,
-          isCurryRight = bitmask & CURRY_RIGHT_FLAG;
-
-      var Ctor = !isBindKey && createCtorWrapper(func),
-          key = func;
+          isCurryRight = bitmask & CURRY_RIGHT_FLAG,
+          Ctor = isBindKey ? null : createCtorWrapper(func);
 
       function wrapper() {
         // Avoid `arguments` object use disqualifying optimizations by
@@ -3997,17 +3928,18 @@ process.umask = function() { return 0; };
             return result;
           }
         }
-        var thisBinding = isBind ? thisArg : this;
-        if (isBindKey) {
-          func = thisBinding[key];
-        }
+        var thisBinding = isBind ? thisArg : this,
+            fn = isBindKey ? thisBinding[func] : func;
+
         if (argPos) {
           args = reorder(args, argPos);
         }
         if (isAry && ary < args.length) {
           args.length = ary;
         }
-        var fn = (this && this !== root && this instanceof wrapper) ? (Ctor || createCtorWrapper(func)) : func;
+        if (this && this !== root && this instanceof wrapper) {
+          fn = Ctor || createCtorWrapper(func);
+        }
         return fn.apply(thisBinding, args);
       }
       return wrapper;
@@ -4081,10 +4013,10 @@ process.umask = function() { return 0; };
      */
     function createSortedIndex(retHighest) {
       return function(array, value, iteratee, thisArg) {
-        var func = getCallback(iteratee);
-        return (func === baseCallback && iteratee == null)
+        var callback = getCallback(iteratee);
+        return (iteratee == null && callback === baseCallback)
           ? binaryIndex(array, value, retHighest)
-          : binaryIndexBy(array, value, func(iteratee, thisArg, 1), retHighest);
+          : binaryIndexBy(array, value, callback(iteratee, thisArg, 1), retHighest);
       };
     }
 
@@ -4170,40 +4102,35 @@ process.umask = function() { return 0; };
     function equalArrays(array, other, equalFunc, customizer, isLoose, stackA, stackB) {
       var index = -1,
           arrLength = array.length,
-          othLength = other.length,
-          result = true;
+          othLength = other.length;
 
       if (arrLength != othLength && !(isLoose && othLength > arrLength)) {
         return false;
       }
-      // Deep compare the contents, ignoring non-numeric properties.
-      while (result && ++index < arrLength) {
+      // Ignore non-index properties.
+      while (++index < arrLength) {
         var arrValue = array[index],
-            othValue = other[index];
+            othValue = other[index],
+            result = customizer ? customizer(isLoose ? othValue : arrValue, isLoose ? arrValue : othValue, index) : undefined;
 
-        result = undefined;
-        if (customizer) {
-          result = isLoose
-            ? customizer(othValue, arrValue, index)
-            : customizer(arrValue, othValue, index);
-        }
-        if (result === undefined) {
-          // Recursively compare arrays (susceptible to call stack limits).
-          if (isLoose) {
-            var othIndex = othLength;
-            while (othIndex--) {
-              othValue = other[othIndex];
-              result = (arrValue && arrValue === othValue) || equalFunc(arrValue, othValue, customizer, isLoose, stackA, stackB);
-              if (result) {
-                break;
-              }
-            }
-          } else {
-            result = (arrValue && arrValue === othValue) || equalFunc(arrValue, othValue, customizer, isLoose, stackA, stackB);
+        if (result !== undefined) {
+          if (result) {
+            continue;
           }
+          return false;
+        }
+        // Recursively compare arrays (susceptible to call stack limits).
+        if (isLoose) {
+          if (!arraySome(other, function(othValue) {
+                return arrValue === othValue || equalFunc(arrValue, othValue, customizer, isLoose, stackA, stackB);
+              })) {
+            return false;
+          }
+        } else if (!(arrValue === othValue || equalFunc(arrValue, othValue, customizer, isLoose, stackA, stackB))) {
+          return false;
         }
       }
-      return !!result;
+      return true;
     }
 
     /**
@@ -4268,29 +4195,22 @@ process.umask = function() { return 0; };
       if (objLength != othLength && !isLoose) {
         return false;
       }
-      var skipCtor = isLoose,
-          index = -1;
-
-      while (++index < objLength) {
-        var key = objProps[index],
-            result = isLoose ? key in other : hasOwnProperty.call(other, key);
-
-        if (result) {
-          var objValue = object[key],
-              othValue = other[key];
-
-          result = undefined;
-          if (customizer) {
-            result = isLoose
-              ? customizer(othValue, objValue, key)
-              : customizer(objValue, othValue, key);
-          }
-          if (result === undefined) {
-            // Recursively compare objects (susceptible to call stack limits).
-            result = (objValue && objValue === othValue) || equalFunc(objValue, othValue, customizer, isLoose, stackA, stackB);
-          }
+      var index = objLength;
+      while (index--) {
+        var key = objProps[index];
+        if (!(isLoose ? key in other : hasOwnProperty.call(other, key))) {
+          return false;
         }
-        if (!result) {
+      }
+      var skipCtor = isLoose;
+      while (++index < objLength) {
+        key = objProps[index];
+        var objValue = object[key],
+            othValue = other[key],
+            result = customizer ? customizer(isLoose ? othValue : objValue, isLoose? objValue : othValue, key) : undefined;
+
+        // Recursively compare objects (susceptible to call stack limits).
+        if (!(result === undefined ? equalFunc(objValue, othValue, customizer, isLoose, stackA, stackB) : result)) {
           return false;
         }
         skipCtor || (skipCtor = key == 'constructor');
@@ -4308,34 +4228,6 @@ process.umask = function() { return 0; };
         }
       }
       return true;
-    }
-
-    /**
-     * Gets the extremum value of `collection` invoking `iteratee` for each value
-     * in `collection` to generate the criterion by which the value is ranked.
-     * The `iteratee` is invoked with three arguments: (value, index, collection).
-     *
-     * @private
-     * @param {Array|Object|string} collection The collection to iterate over.
-     * @param {Function} iteratee The function invoked per iteration.
-     * @param {boolean} [isMin] Specify returning the minimum, instead of the
-     *  maximum, extremum value.
-     * @returns {*} Returns the extremum value.
-     */
-    function extremumBy(collection, iteratee, isMin) {
-      var exValue = isMin ? POSITIVE_INFINITY : NEGATIVE_INFINITY,
-          computed = exValue,
-          result = computed;
-
-      baseEach(collection, function(value, index, collection) {
-        var current = iteratee(value, index, collection);
-        if ((isMin ? (current < computed) : (current > computed)) ||
-            (current === exValue && current === result)) {
-          computed = current;
-          result = value;
-        }
-      });
-      return result;
     }
 
     /**
@@ -4371,29 +4263,20 @@ process.umask = function() { return 0; };
      * @param {Function} func The function to query.
      * @returns {string} Returns the function name.
      */
-    var getFuncName = (function() {
-      if (!support.funcNames) {
-        return constant('');
-      }
-      if (constant.name == 'constant') {
-        return baseProperty('name');
-      }
-      return function(func) {
-        var result = func.name,
-            array = realNames[result],
-            length = array ? array.length : 0;
+    function getFuncName(func) {
+      var result = func.name,
+          array = realNames[result],
+          length = array ? array.length : 0;
 
-        while (length--) {
-          var data = array[length],
-              otherFunc = data.func;
-
-          if (otherFunc == null || otherFunc == func) {
-            return data.name;
-          }
+      while (length--) {
+        var data = array[length],
+            otherFunc = data.func;
+        if (otherFunc == null || otherFunc == func) {
+          return data.name;
         }
-        return result;
-      };
-    }());
+      }
+      return result;
+    }
 
     /**
      * Gets the appropriate "indexOf" function. If the `_.indexOf` method is
@@ -4423,15 +4306,34 @@ process.umask = function() { return 0; };
     var getLength = baseProperty('length');
 
     /**
-     * Creates an array of the own symbols of `object`.
+     * Gets the propery names, values, and compare flags of `object`.
      *
      * @private
      * @param {Object} object The object to query.
-     * @returns {Array} Returns the array of symbols.
+     * @returns {Array} Returns the match data of `object`.
      */
-    var getSymbols = !getOwnPropertySymbols ? constant([]) : function(object) {
-      return getOwnPropertySymbols(toObject(object));
-    };
+    function getMatchData(object) {
+      var result = pairs(object),
+          length = result.length;
+
+      while (length--) {
+        result[length][2] = isStrictComparable(result[length][1]);
+      }
+      return result;
+    }
+
+    /**
+     * Gets the native function at `key` of `object`.
+     *
+     * @private
+     * @param {Object} object The object to query.
+     * @param {string} key The key of the method to get.
+     * @returns {*} Returns the function if it's native, else `undefined`.
+     */
+    function getNative(object, key) {
+      var value = object == null ? undefined : object[key];
+      return isNative(value) ? value : undefined;
+    }
 
     /**
      * Gets the view, applying any `transforms` to the `start` and `end` positions.
@@ -4573,7 +4475,7 @@ process.umask = function() { return 0; };
      * @returns {boolean} Returns `true` if `value` is a valid index, else `false`.
      */
     function isIndex(value, length) {
-      value = +value;
+      value = typeof value == 'number' ? value : parseFloat(value);
       length = length == null ? MAX_SAFE_INTEGER : length;
       return value > -1 && value % 1 == 0 && value < length;
     }
@@ -4870,11 +4772,10 @@ process.umask = function() { return 0; };
     function shimKeys(object) {
       var props = keysIn(object),
           propsLength = props.length,
-          length = propsLength && object.length,
-          support = lodash.support;
+          length = propsLength && object.length;
 
-      var allowIndexes = length && isLength(length) &&
-        (isArray(object) || (support.nonEnumArgs && isArguments(object)));
+      var allowIndexes = !!length && isLength(length) &&
+        (isArray(object) || isArguments(object));
 
       var index = -1,
           result = [];
@@ -4889,7 +4790,7 @@ process.umask = function() { return 0; };
     }
 
     /**
-     * Converts `value` to an array-like object if it is not one.
+     * Converts `value` to an array-like object if it's not one.
      *
      * @private
      * @param {*} value The value to process.
@@ -4906,7 +4807,7 @@ process.umask = function() { return 0; };
     }
 
     /**
-     * Converts `value` to an object if it is not one.
+     * Converts `value` to an object if it's not one.
      *
      * @private
      * @param {*} value The value to process.
@@ -4917,7 +4818,7 @@ process.umask = function() { return 0; };
     }
 
     /**
-     * Converts `value` to property path array if it is not one.
+     * Converts `value` to property path array if it's not one.
      *
      * @private
      * @param {*} value The value to process.
@@ -5501,27 +5402,19 @@ process.umask = function() { return 0; };
      * _.intersection([1, 2], [4, 2], [2, 1]);
      * // => [2]
      */
-    function intersection() {
-      var args = [],
-          argsIndex = -1,
-          argsLength = arguments.length,
-          caches = [],
+    var intersection = restParam(function(arrays) {
+      var othLength = arrays.length,
+          othIndex = othLength,
+          caches = Array(length),
           indexOf = getIndexOf(),
           isCommon = indexOf == baseIndexOf,
           result = [];
 
-      while (++argsIndex < argsLength) {
-        var value = arguments[argsIndex];
-        if (isArrayLike(value)) {
-          args.push(value);
-          caches.push((isCommon && value.length >= 120) ? createCache(argsIndex && value) : null);
-        }
+      while (othIndex--) {
+        var value = arrays[othIndex] = isArrayLike(value = arrays[othIndex]) ? value : [];
+        caches[othIndex] = (isCommon && value.length >= 120) ? createCache(othIndex && value) : null;
       }
-      argsLength = args.length;
-      if (argsLength < 2) {
-        return result;
-      }
-      var array = args[0],
+      var array = arrays[0],
           index = -1,
           length = array ? array.length : 0,
           seen = caches[0];
@@ -5530,10 +5423,10 @@ process.umask = function() { return 0; };
       while (++index < length) {
         value = array[index];
         if ((seen ? cacheIndexOf(seen, value) : indexOf(result, value, 0)) < 0) {
-          argsIndex = argsLength;
-          while (--argsIndex) {
-            var cache = caches[argsIndex];
-            if ((cache ? cacheIndexOf(cache, value) : indexOf(args[argsIndex], value, 0)) < 0) {
+          var othIndex = othLength;
+          while (--othIndex) {
+            var cache = caches[othIndex];
+            if ((cache ? cacheIndexOf(cache, value) : indexOf(arrays[othIndex], value, 0)) < 0) {
               continue outer;
             }
           }
@@ -5544,7 +5437,7 @@ process.umask = function() { return 0; };
         }
       }
       return result;
-    }
+    });
 
     /**
      * Gets the last element of `array`.
@@ -6127,9 +6020,9 @@ process.umask = function() { return 0; };
         iteratee = isIterateeCall(array, isSorted, thisArg) ? null : isSorted;
         isSorted = false;
       }
-      var func = getCallback();
-      if (!(func === baseCallback && iteratee == null)) {
-        iteratee = func(iteratee, thisArg, 3);
+      var callback = getCallback();
+      if (!(iteratee == null && callback === baseCallback)) {
+        iteratee = callback(iteratee, thisArg, 3);
       }
       return (isSorted && getIndexOf() == baseIndexOf)
         ? sortedUniq(array, iteratee)
@@ -6336,8 +6229,8 @@ process.umask = function() { return 0; };
      */
     var zipWith = restParam(function(arrays) {
       var length = arrays.length,
-          iteratee = arrays[length - 2],
-          thisArg = arrays[length - 1];
+          iteratee = length > 2 ? arrays[length - 2] : undefined,
+          thisArg = length > 1 ? arrays[length - 1] : undefined;
 
       if (length > 2 && typeof iteratee == 'function') {
         length -= 2;
@@ -7090,7 +6983,7 @@ process.umask = function() { return 0; };
     });
 
     /**
-     * Invokes the method at `path` on each element in `collection`, returning
+     * Invokes the method at `path` of each element in `collection`, returning
      * an array of the results of each invoked method. Any additional arguments
      * are provided to each invoked method. If `methodName` is a function it is
      * invoked for, and `this` bound to, each element in `collection`.
@@ -7118,7 +7011,7 @@ process.umask = function() { return 0; };
           result = isArrayLike(collection) ? Array(collection.length) : [];
 
       baseEach(collection, function(value) {
-        var func = isFunc ? path : (isProp && value != null && value[path]);
+        var func = isFunc ? path : ((isProp && value != null) ? value[path] : null);
         result[++index] = func ? func.apply(value, args) : invokePath(value, path, args);
       });
       return result;
@@ -7140,7 +7033,7 @@ process.umask = function() { return 0; };
      * callback returns `true` for elements that have the properties of the given
      * object, else `false`.
      *
-     * Many lodash methods are guarded to work as interatees for methods like
+     * Many lodash methods are guarded to work as iteratees for methods like
      * `_.every`, `_.filter`, `_.map`, `_.mapValues`, `_.reject`, and `_.some`.
      *
      * The guarded methods are:
@@ -7284,7 +7177,7 @@ process.umask = function() { return 0; };
      * value. The `iteratee` is bound to `thisArg` and invoked with four arguments:
      * (accumulator, value, index|key, collection).
      *
-     * Many lodash methods are guarded to work as interatees for methods like
+     * Many lodash methods are guarded to work as iteratees for methods like
      * `_.reduce`, `_.reduceRight`, and `_.transform`.
      *
      * The guarded methods are:
@@ -8061,12 +7954,13 @@ process.umask = function() { return 0; };
     var curryRight = createCurry(CURRY_RIGHT_FLAG);
 
     /**
-     * Creates a function that delays invoking `func` until after `wait` milliseconds
-     * have elapsed since the last time it was invoked. The created function comes
-     * with a `cancel` method to cancel delayed invocations. Provide an options
-     * object to indicate that `func` should be invoked on the leading and/or
-     * trailing edge of the `wait` timeout. Subsequent calls to the debounced
-     * function return the result of the last `func` invocation.
+     * Creates a debounced function that delays invoking `func` until after `wait`
+     * milliseconds have elapsed since the last time the debounced function was
+     * invoked. The debounced function comes with a `cancel` method to cancel
+     * delayed invocations. Provide an options object to indicate that `func`
+     * should be invoked on the leading and/or trailing edge of the `wait` timeout.
+     * Subsequent calls to the debounced function return the result of the last
+     * `func` invocation.
      *
      * **Note:** If `leading` and `trailing` options are `true`, `func` is invoked
      * on the trailing edge of the timeout only if the the debounced function is
@@ -8380,14 +8274,14 @@ process.umask = function() { return 0; };
       }
       var memoized = function() {
         var args = arguments,
-            cache = memoized.cache,
-            key = resolver ? resolver.apply(this, args) : args[0];
+            key = resolver ? resolver.apply(this, args) : args[0],
+            cache = memoized.cache;
 
         if (cache.has(key)) {
           return cache.get(key);
         }
         var result = func.apply(this, args);
-        cache.set(key, result);
+        memoized.cache = cache.set(key, result);
         return result;
       };
       memoized.cache = new memoize.Cache;
@@ -8634,12 +8528,12 @@ process.umask = function() { return 0; };
     }
 
     /**
-     * Creates a function that only invokes `func` at most once per every `wait`
-     * milliseconds. The created function comes with a `cancel` method to cancel
-     * delayed invocations. Provide an options object to indicate that `func`
-     * should be invoked on the leading and/or trailing edge of the `wait` timeout.
-     * Subsequent calls to the throttled function return the result of the last
-     * `func` call.
+     * Creates a throttled function that only invokes `func` at most once per
+     * every `wait` milliseconds. The throttled function comes with a `cancel`
+     * method to cancel delayed invocations. Provide an options object to indicate
+     * that `func` should be invoked on the leading and/or trailing edge of the
+     * `wait` timeout. Subsequent calls to the throttled function return the
+     * result of the last `func` call.
      *
      * **Note:** If `leading` and `trailing` options are `true`, `func` is invoked
      * on the trailing edge of the timeout only if the the throttled function is
@@ -8777,8 +8671,9 @@ process.umask = function() { return 0; };
         customizer = isDeep;
         isDeep = false;
       }
-      customizer = typeof customizer == 'function' && bindCallback(customizer, thisArg, 1);
-      return baseClone(value, isDeep, customizer);
+      return typeof customizer == 'function'
+        ? baseClone(value, isDeep, bindCallback(customizer, thisArg, 1))
+        : baseClone(value, isDeep);
     }
 
     /**
@@ -8827,8 +8722,57 @@ process.umask = function() { return 0; };
      * // => 20
      */
     function cloneDeep(value, customizer, thisArg) {
-      customizer = typeof customizer == 'function' && bindCallback(customizer, thisArg, 1);
-      return baseClone(value, true, customizer);
+      return typeof customizer == 'function'
+        ? baseClone(value, true, bindCallback(customizer, thisArg, 1))
+        : baseClone(value, true);
+    }
+
+    /**
+     * Checks if `value` is greater than `other`.
+     *
+     * @static
+     * @memberOf _
+     * @category Lang
+     * @param {*} value The value to compare.
+     * @param {*} other The other value to compare.
+     * @returns {boolean} Returns `true` if `value` is greater than `other`, else `false`.
+     * @example
+     *
+     * _.gt(3, 1);
+     * // => true
+     *
+     * _.gt(3, 3);
+     * // => false
+     *
+     * _.gt(1, 3);
+     * // => false
+     */
+    function gt(value, other) {
+      return value > other;
+    }
+
+    /**
+     * Checks if `value` is greater than or equal to `other`.
+     *
+     * @static
+     * @memberOf _
+     * @category Lang
+     * @param {*} value The value to compare.
+     * @param {*} other The other value to compare.
+     * @returns {boolean} Returns `true` if `value` is greater than or equal to `other`, else `false`.
+     * @example
+     *
+     * _.gte(3, 1);
+     * // => true
+     *
+     * _.gte(3, 3);
+     * // => true
+     *
+     * _.gte(1, 3);
+     * // => false
+     */
+    function gte(value, other) {
+      return value >= other;
     }
 
     /**
@@ -8991,6 +8935,7 @@ process.umask = function() { return 0; };
      *
      * @static
      * @memberOf _
+     * @alias eq
      * @category Lang
      * @param {*} value The value to compare.
      * @param {*} other The other value to compare.
@@ -9020,12 +8965,9 @@ process.umask = function() { return 0; };
      * // => true
      */
     function isEqual(value, other, customizer, thisArg) {
-      customizer = typeof customizer == 'function' && bindCallback(customizer, thisArg, 3);
-      if (!customizer && isStrictComparable(value) && isStrictComparable(other)) {
-        return value === other;
-      }
+      customizer = typeof customizer == 'function' ? bindCallback(customizer, thisArg, 3) : undefined;
       var result = customizer ? customizer(value, other) : undefined;
-      return result === undefined ? baseIsEqual(value, other, customizer) : !!result;
+      return  result === undefined ? baseIsEqual(value, other, customizer) : !!result;
     }
 
     /**
@@ -9127,7 +9069,7 @@ process.umask = function() { return 0; };
       // Avoid a V8 JIT bug in Chrome 19-20.
       // See https://code.google.com/p/v8/issues/detail?id=2291 for more details.
       var type = typeof value;
-      return type == 'function' || (!!value && type == 'object');
+      return !!value && (type == 'object' || type == 'function');
     }
 
     /**
@@ -9170,33 +9112,8 @@ process.umask = function() { return 0; };
      * // => true
      */
     function isMatch(object, source, customizer, thisArg) {
-      var props = keys(source),
-          length = props.length;
-
-      if (!length) {
-        return true;
-      }
-      if (object == null) {
-        return false;
-      }
-      customizer = typeof customizer == 'function' && bindCallback(customizer, thisArg, 3);
-      object = toObject(object);
-      if (!customizer && length == 1) {
-        var key = props[0],
-            value = source[key];
-
-        if (isStrictComparable(value)) {
-          return value === object[key] && (value !== undefined || (key in object));
-        }
-      }
-      var values = Array(length),
-          strictCompareFlags = Array(length);
-
-      while (length--) {
-        value = values[length] = source[props[length]];
-        strictCompareFlags[length] = isStrictComparable(value);
-      }
-      return baseIsMatch(object, props, values, strictCompareFlags, customizer);
+      customizer = typeof customizer == 'function' ? bindCallback(customizer, thisArg, 3) : undefined;
+      return baseIsMatch(object, getMatchData(source), customizer);
     }
 
     /**
@@ -9336,8 +9253,8 @@ process.umask = function() { return 0; };
       if (!(value && objToString.call(value) == objectTag)) {
         return false;
       }
-      var valueOf = value.valueOf,
-          objProto = isNative(valueOf) && (objProto = getPrototypeOf(valueOf)) && getPrototypeOf(objProto);
+      var valueOf = getNative(value, 'valueOf'),
+          objProto = valueOf && (objProto = getPrototypeOf(valueOf)) && getPrototypeOf(objProto);
 
       return objProto
         ? (value == objProto || getPrototypeOf(value) == objProto)
@@ -9422,6 +9339,54 @@ process.umask = function() { return 0; };
      */
     function isUndefined(value) {
       return value === undefined;
+    }
+
+    /**
+     * Checks if `value` is less than `other`.
+     *
+     * @static
+     * @memberOf _
+     * @category Lang
+     * @param {*} value The value to compare.
+     * @param {*} other The other value to compare.
+     * @returns {boolean} Returns `true` if `value` is less than `other`, else `false`.
+     * @example
+     *
+     * _.lt(1, 3);
+     * // => true
+     *
+     * _.lt(3, 3);
+     * // => false
+     *
+     * _.lt(3, 1);
+     * // => false
+     */
+    function lt(value, other) {
+      return value < other;
+    }
+
+    /**
+     * Checks if `value` is less than or equal to `other`.
+     *
+     * @static
+     * @memberOf _
+     * @category Lang
+     * @param {*} value The value to compare.
+     * @param {*} other The other value to compare.
+     * @returns {boolean} Returns `true` if `value` is less than or equal to `other`, else `false`.
+     * @example
+     *
+     * _.lte(1, 3);
+     * // => true
+     *
+     * _.lte(3, 3);
+     * // => true
+     *
+     * _.lte(3, 1);
+     * // => false
+     */
+    function lte(value, other) {
+      return value <= other;
     }
 
     /**
@@ -9816,7 +9781,7 @@ process.umask = function() { return 0; };
     }
 
     /**
-     * Gets the property value of `path` on `object`. If the resolved value is
+     * Gets the property value at `path` of `object`. If the resolved value is
      * `undefined` the `defaultValue` is used in its place.
      *
      * @static
@@ -9874,10 +9839,14 @@ process.umask = function() { return 0; };
       if (!result && !isKey(path)) {
         path = toPath(path);
         object = path.length == 1 ? object : baseGet(object, baseSlice(path, 0, -1));
+        if (object == null) {
+          return false;
+        }
         path = last(path);
-        result = object != null && hasOwnProperty.call(object, path);
+        result = hasOwnProperty.call(object, path);
       }
-      return result;
+      return result || (isLength(object.length) && isIndex(path, object.length) &&
+        (isArray(object) || isArguments(object)));
     }
 
     /**
@@ -9958,7 +9927,7 @@ process.umask = function() { return 0; };
      * // => ['0', '1']
      */
     var keys = !nativeKeys ? shimKeys : function(object) {
-      var Ctor = object != null && object.constructor;
+      var Ctor = object == null ? null : object.constructor;
       if ((typeof Ctor == 'function' && Ctor.prototype === object) ||
           (typeof object != 'function' && isArrayLike(object))) {
         return shimKeys(object);
@@ -9997,7 +9966,7 @@ process.umask = function() { return 0; };
       }
       var length = object.length;
       length = (length && isLength(length) &&
-        (isArray(object) || (support.nonEnumArgs && isArguments(object))) && length) || 0;
+        (isArray(object) || isArguments(object)) && length) || 0;
 
       var Ctor = object.constructor,
           index = -1,
@@ -10184,6 +10153,8 @@ process.umask = function() { return 0; };
      * // => [['barney', 36], ['fred', 40]] (iteration order is not guaranteed)
      */
     function pairs(object) {
+      object = toObject(object);
+
       var index = -1,
           props = keys(object),
           length = props.length,
@@ -10360,7 +10331,7 @@ process.umask = function() { return 0; };
           if (isArr) {
             accumulator = isArray(object) ? new Ctor : [];
           } else {
-            accumulator = baseCreate(isFunction(Ctor) && Ctor.prototype);
+            accumulator = baseCreate(isFunction(Ctor) ? Ctor.prototype : null);
           }
         } else {
           accumulator = {};
@@ -10635,7 +10606,7 @@ process.umask = function() { return 0; };
      * use a third-party library like [_he_](https://mths.be/he).
      *
      * Though the ">" character is escaped for symmetry, characters like
-     * ">" and "/" don't require escaping in HTML and have no special meaning
+     * ">" and "/" don't need escaping in HTML and have no special meaning
      * unless they're part of a tag or unquoted attribute value.
      * See [Mathias Bynens's article](https://mathiasbynens.be/notes/ambiguous-ampersands)
      * (under "semi-related fun fact") for more details.
@@ -10712,7 +10683,7 @@ process.umask = function() { return 0; };
     });
 
     /**
-     * Pads `string` on the left and right sides if it is shorter than `length`.
+     * Pads `string` on the left and right sides if it's shorter than `length`.
      * Padding characters are truncated if they can't be evenly divided by `length`.
      *
      * @static
@@ -10750,7 +10721,7 @@ process.umask = function() { return 0; };
     }
 
     /**
-     * Pads `string` on the left side if it is shorter than `length`. Padding
+     * Pads `string` on the left side if it's shorter than `length`. Padding
      * characters are truncated if they exceed `length`.
      *
      * @static
@@ -10774,7 +10745,7 @@ process.umask = function() { return 0; };
     var padLeft = createPadDir();
 
     /**
-     * Pads `string` on the right side if it is shorter than `length`. Padding
+     * Pads `string` on the right side if it's shorter than `length`. Padding
      * characters are truncated if they exceed `length`.
      *
      * @static
@@ -11255,7 +11226,7 @@ process.umask = function() { return 0; };
     }
 
     /**
-     * Truncates `string` if it is longer than the given maximum string length.
+     * Truncates `string` if it's longer than the given maximum string length.
      * The last characters of the truncated string are replaced with the omission
      * string which defaults to "...".
      *
@@ -11554,7 +11525,7 @@ process.umask = function() { return 0; };
      * @memberOf _
      * @category Utility
      * @param {Array|string} path The path of the property to get.
-     * @param {*} value The value to compare.
+     * @param {*} srcValue The value to match.
      * @returns {Function} Returns the new function.
      * @example
      *
@@ -11566,8 +11537,8 @@ process.umask = function() { return 0; };
      * _.find(users, _.matchesProperty('user', 'fred'));
      * // => { 'user': 'fred' }
      */
-    function matchesProperty(path, value) {
-      return baseMatchesProperty(path, baseClone(value, true));
+    function matchesProperty(path, srcValue) {
+      return baseMatchesProperty(path, baseClone(srcValue, true));
     }
 
     /**
@@ -11648,9 +11619,6 @@ process.umask = function() { return 0; };
      *   });
      * }
      *
-     * // use `_.runInContext` to avoid conflicts (esp. in Node.js)
-     * var _ = require('lodash').runInContext();
-     *
      * _.mixin({ 'vowels': vowels });
      * _.vowels('fred');
      * // => ['e']
@@ -11665,8 +11633,8 @@ process.umask = function() { return 0; };
     function mixin(object, source, options) {
       if (options == null) {
         var isObj = isObject(source),
-            props = isObj && keys(source),
-            methodNames = props && props.length && baseFunctions(source, props);
+            props = isObj ? keys(source) : null,
+            methodNames = (props && props.length) ? baseFunctions(source, props) : null;
 
         if (!(methodNames ? methodNames.length : isObj)) {
           methodNames = false;
@@ -11996,7 +11964,7 @@ process.umask = function() { return 0; };
      * _.max(users, 'age');
      * // => { 'user': 'fred', 'age': 40 }
      */
-    var max = createExtremum(arrayMax);
+    var max = createExtremum(gt, -Infinity);
 
     /**
      * Gets the minimum value of `collection`. If `collection` is empty or falsey
@@ -12045,7 +12013,7 @@ process.umask = function() { return 0; };
      * _.min(users, 'age');
      * // => { 'user': 'barney', 'age': 36 }
      */
-    var min = createExtremum(arrayMin, true);
+    var min = createExtremum(lt, Infinity);
 
     /**
      * Gets the sum of the values in `collection`.
@@ -12083,12 +12051,12 @@ process.umask = function() { return 0; };
       if (thisArg && isIterateeCall(collection, iteratee, thisArg)) {
         iteratee = null;
       }
-      var func = getCallback(),
+      var callback = getCallback(),
           noIteratee = iteratee == null;
 
-      if (!(func === baseCallback && noIteratee)) {
+      if (!(noIteratee && callback === baseCallback)) {
         noIteratee = false;
-        iteratee = func(iteratee, thisArg, 3);
+        iteratee = callback(iteratee, thisArg, 3);
       }
       return noIteratee
         ? arraySum(isArray(collection) ? collection : toIterable(collection))
@@ -12263,6 +12231,8 @@ process.umask = function() { return 0; };
     lodash.findWhere = findWhere;
     lodash.first = first;
     lodash.get = get;
+    lodash.gt = gt;
+    lodash.gte = gte;
     lodash.has = has;
     lodash.identity = identity;
     lodash.includes = includes;
@@ -12292,6 +12262,8 @@ process.umask = function() { return 0; };
     lodash.kebabCase = kebabCase;
     lodash.last = last;
     lodash.lastIndexOf = lastIndexOf;
+    lodash.lt = lt;
+    lodash.lte = lte;
     lodash.max = max;
     lodash.min = min;
     lodash.noConflict = noConflict;
@@ -12328,6 +12300,7 @@ process.umask = function() { return 0; };
     lodash.all = every;
     lodash.any = some;
     lodash.contains = includes;
+    lodash.eq = isEqual;
     lodash.detect = find;
     lodash.foldl = reduce;
     lodash.foldr = reduceRight;
@@ -12607,7 +12580,7 @@ process.umask = function() { return 0; };
     if (moduleExports) {
       (freeModule.exports = _)._ = _;
     }
-    // Export for Narwhal or Rhino -require.
+    // Export for Rhino with CommonJS support.
     else {
       freeExports._ = _;
     }
@@ -20574,6 +20547,998 @@ function toArray(list, index) {
 }
 
 },{}],61:[function(require,module,exports){
+'use strict';
+
+//jshint maxparams: 6
+module.exports = {
+  type: 'ClientSideAssembler',
+  deps: ['SocketBehaviour', 'Dimensions', 'Window', 'UpdateLoop', 'OnResize', 'OnInitialise'],
+  func: function (socketBehaviour, dimensions, window, updateLoop, resizeCallbacks, onInitialiseCallbacks) {
+
+    var each = require('lodash').each;
+    var $ = require('zepto-browserify').$;
+
+    var resizeCanvas = function () {
+      var dims = dimensions().get();
+
+      each(resizeCallbacks(), function(resizeCallback) {
+        resizeCallback(dims);
+      });
+    };
+
+    return {
+      assembleAndRun: function () {
+        each(onInitialiseCallbacks(), function (callback) {
+          callback();
+        });
+
+        socketBehaviour().connect();
+
+        $(window()).on('load resize', resizeCanvas);
+        updateLoop().run();
+      }
+    };
+  }
+};
+},{"lodash":6,"zepto-browserify":84}],62:[function(require,module,exports){
+'use strict';
+
+var plugins = require('plug-n-play').configure(['View', 'InputMode', 'OnMute', 'OnPause', 'OnResume', 'OnUnmute', 'OnConnect', 'OnDisconnect', 'OnEachFrame', 'OnResize', 'OnPacket', 'OnSetup', 'OnError', 'OnInitialise']);
+
+module.exports = {
+  load: plugins.load,
+  set: plugins.set,
+  loadWindow: function (window) {
+    plugins.set('Window', window);
+  },
+  run: function () {
+    plugins.get('ClientSideAssembler').assembleAndRun();
+  },
+  loadDefaults: function () {
+    plugins.set('ServerUrl', 'http://localhost:3000/');
+    plugins.set('GameMode', 'game');
+    plugins.set('AspectRatio', 26 / 10);
+    plugins.set('WidescreenMinimumMargin', 32);
+    plugins.set('Element', 'canvas');
+    plugins.set('InputElement', 'input');
+
+    plugins.load(require('./ui/dimensions'));
+    plugins.load(require('./ui/effects'));
+    plugins.load(require('./events/on_connect'));
+    plugins.load(require('./events/on_disconnect'));
+    plugins.load(require('./events/on_resize'));
+    plugins.load(require('./events/acknowledge-packet'));
+    plugins.load(require('./events/initialise-state'));
+    plugins.load(require('./events/update-state'));
+    plugins.load(require('./events/initialise-views'));
+    plugins.load(require('./events/on-error'));
+    plugins.load(require('./state/tracker'));
+    plugins.load(require('./state/shortcuts'));
+    plugins.load(require('./input/keyboard'));
+    plugins.load(require('./update/loop'));
+    plugins.load(require('./socket/client'));
+    plugins.load(require('./socket/pending-acknowledgements'));
+
+    plugins.load(require('./views/fullscreen'));
+    plugins.load(require('./views/toggle_sound'));
+    plugins.load(require('./views/layout_icons'));
+    plugins.load(require('./views/player_observer_count'));
+    plugins.load(require('./views/pause_resume'));
+
+    plugins.load(require('./assembler'));
+  }
+};
+},{"./assembler":61,"./events/acknowledge-packet":63,"./events/initialise-state":64,"./events/initialise-views":65,"./events/on-error":66,"./events/on_connect":67,"./events/on_disconnect":68,"./events/on_resize":69,"./events/update-state":70,"./input/keyboard":71,"./socket/client":72,"./socket/pending-acknowledgements":73,"./state/shortcuts":74,"./state/tracker":75,"./ui/dimensions":76,"./ui/effects":77,"./update/loop":78,"./views/fullscreen":79,"./views/layout_icons":80,"./views/pause_resume":81,"./views/player_observer_count":82,"./views/toggle_sound":83,"plug-n-play":9}],63:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+  type: 'OnPacket',
+  deps: ['PendingAcknowledgements'],
+  func: function (pendingAcknowledgements) {
+    return function (packet) {
+      pendingAcknowledgements().add(packet.id);
+    };
+  }
+};
+},{}],64:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+  type: 'OnSetup',
+  deps: ['StateTracker'],
+  func: function (tracker) {
+    return function (state) {
+      tracker().updateState(state);
+    };
+  }
+};
+},{}],65:[function(require,module,exports){
+'use strict';
+
+var each = require('lodash').each;
+
+module.exports = {
+  type: 'OnSetup',
+  deps: ['View', 'Dimensions'],
+  func: function (views, dimensions) {
+    return function () {
+      var dims = dimensions().get();
+
+      each(views(), function(view) {
+        view(dims);
+      });
+    };
+  }
+};
+},{"lodash":6}],66:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+  type: 'OnError',
+  func: function() {
+    return function(data) {
+      throw new Error(data);
+    };
+  }
+};
+},{}],67:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+  type: 'OnConnect',
+  func: function () {
+    var $ = require('zepto-browserify').$;
+
+    return function () {
+      $('.disconnected').hide();
+    };
+  }
+};
+},{"zepto-browserify":84}],68:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+  type: 'OnDisconnect',
+  func: function () {
+    var $ = require('zepto-browserify').$;
+
+    return function () {
+      $('.disconnected').show();
+    };
+  }
+};
+},{"zepto-browserify":84}],69:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+  type: 'OnResize',
+  deps: ['Element', 'InputElement'],
+  func: function (element, inputElement) {
+    var $ = require('zepto-browserify').$;
+
+    return function (dims) {
+      $('#' + element()).css('margin-top', dims.marginTopBottom);
+      $('#' + element()).css('width', dims.usableWidth);
+      $('#' + element()).css('height', dims.usableHeight);
+
+      $('#' + inputElement()).css('width', dims.usableWidth);
+      $('#' + inputElement()).css('height', dims.usableHeight);
+    };
+  }
+};
+},{"zepto-browserify":84}],70:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+  type: 'OnPacket',
+  deps: ['StateTracker'],
+  func: function (tracker) {
+    var lastReceivedId = 0;
+
+    return function (packet) {
+      if (packet.id <= lastReceivedId) {
+        return;
+      }
+      lastReceivedId = packet.id;
+
+      tracker().updateState(packet.gameState);
+    };
+  }
+};
+},{}],71:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+  deps: ['Window', 'InputElement'],
+  type: 'InputMode',
+  func: function (window, element) {
+    var _ = require('lodash');
+    var $ = require('zepto-browserify').$;
+
+    return {
+      InputMode: function () {
+        var x = 0;
+        var y = 0;
+        var touches = [];
+        var keys = {};
+        var singlePressKeys = {};
+
+        var keyMap = function () {
+          var map = {
+            '9': 'tab',
+            '17': 'control',
+            '18': 'alt',
+            '27': 'escape',
+            '32': 'space',
+            '37': 'left',
+            '38': 'up',
+            '39': 'right',
+            '40': 'down'
+          };
+          var i = 0;
+
+          for (i = 48; i <= 122; i += 1) {
+            if (i > 57 && i < 65) { continue; }
+            if (i > 90 && i < 97) { continue; }
+            if (map[i] !== undefined) {
+              continue;
+            }
+            map[i] = String.fromCharCode(i);
+          }
+
+          return map;
+        };
+
+        var mouseMap = function () {
+          return {
+            '1': 'button1',
+            '3': 'button2'
+          };
+        };
+
+        var singlePress = function (key) {
+          singlePressKeys[key] = true;
+        };
+
+        var press = function (key) {
+          keys[key] = true;
+        };
+
+        var release = function (key) {
+          keys[key] = false;
+        };
+
+        var bindToWindowEvents = function () {
+          $(window()).on('click', function (e) {
+            singlePress(mouseMap()[e.which]);
+            // e.preventDefault();
+          });
+
+          $(window()).on('mousedown', function (e) {
+            press(mouseMap()[e.which]);
+            e.preventDefault();
+          });
+
+          $(window()).on('mouseup', function (e) {
+            release(mouseMap()[e.which]);
+            e.preventDefault();
+          });
+
+          var elementId = '#' + element();
+
+          $(elementId).on('mousemove', function (e) {
+            x = e.layerX;
+            y = e.layerY;
+          });
+
+          $(elementId).on('touchstart', function (e) {
+            _.each(e.touches, function (touch) {
+              var x = touch.clientX - touch.target.offsetLeft;
+              var y = touch.clientY - touch.target.offsetTop;
+              touches.push({ id: touch.identifier, x: x, y: y, force: touch.webkitForce || 1 });
+            });
+          });
+
+          $(elementId).on('touchmove', function (e) {
+            _.each(e.touches, function (touch) {
+              var x = touch.clientX - touch.target.offsetLeft;
+              var y = touch.clientY - touch.target.offsetTop;
+              touches.push({ id: touch.identifier, x: x, y: y, force: touch.webkitForce || 1 });
+            });
+          });
+
+          $(elementId).on('touchend', function (e) {
+            var ids = _.map(e.changedTouches, function (touch) { return touch.identifier; });
+            touches = _.reject(touches, function (touch) { return ids.indexOf(touch.id) !== -1; });
+          });
+
+          $(elementId).on('touchleave', function (e) {
+            var ids = _.map(e.changedTouches, function (touch) { return touch.identifier; });
+            touches = _.reject(touches, function (touch) { return ids.indexOf(touch.id) !== -1; });
+          });
+
+          $(elementId).on('touchcancel', function (e) {
+            var ids = _.map(e.changedTouches, function (touch) { return touch.identifier; });
+            touches = _.reject(touches, function (touch) { return ids.indexOf(touch.id) !== -1; });
+          });
+
+
+          $(window().document).keypress(function (e) {
+            if (e.metaKey) { return; }
+
+            singlePress(keyMap()[e.which]);
+            //to ensure that both keypress and keydown fire on the same event. We can work around this
+            //but we'll need to get a replicable scene (this is only a problem for the space key)
+            // e.preventDefault();
+          });
+
+          $(window().document).keydown(function (e) {
+            if (e.metaKey) { return; }
+
+            press(keyMap()[e.which]);
+            // e.preventDefault();
+          });
+
+          $(window().document).keyup(function (e) {
+            release(keyMap()[e.which]);
+          });
+        };
+
+        bindToWindowEvents();
+
+        return {
+          getCurrentState: function () {
+            var inputData = {
+              mouse: {
+                x: x,
+                y: y
+              },
+              touches: touches
+            };
+
+            var keysToSend = [];
+            _.each(keys, function (value, key) {
+              if (value) {
+                keysToSend.push(key);
+              }
+            });
+            inputData.keys = keysToSend;
+
+            var singlePressKeysToSend = [];
+            _.each(singlePressKeys, function (value, key) {
+              if (value) {
+                singlePressKeysToSend.push(key);
+              }
+              singlePressKeys[key] = false;
+            });
+            inputData.singlePressKeys = singlePressKeysToSend;
+
+            return inputData;
+          }
+        };
+      }
+    };
+  }
+};
+},{"lodash":6,"zepto-browserify":84}],72:[function(require,module,exports){
+'use strict';
+
+var each = require('lodash').each;
+var extend = require('lodash').extend;
+var $ = require('zepto-browserify').$;
+
+//jshint maxparams: 10
+module.exports = {
+  deps: ['Window', 'InputMode', 'GameMode', 'ServerUrl', 'OnConnect', 'OnDisconnect', 'PendingAcknowledgements', 'OnPacket', 'OnSetup', 'OnError'],
+  type: 'SocketBehaviour',
+  func: function (window, inputModes, gameMode, serverUrl, onConnectCallbacks, onDisconnectCallbacks, pendingAcknowledgements, onPacketCallbacks, onSetupCallbacks, onErrorCallbacks) {
+
+    var controls = [];
+
+    var configureEmitFunction = function (socket) {
+      return function () {
+        var packet = {
+          pendingAcks: pendingAcknowledgements().flush(),
+          sentTimestamp: Date.now()
+        };
+
+        each(controls, function (control) {
+          extend(packet, control.getCurrentState());
+        });
+
+        socket.emit('input', packet);
+      };
+    };
+
+    var url = function () {
+      return serverUrl() + gameMode() + '/primary';
+    };
+
+    return {
+      connect: function () {
+        var io = require('socket.io-client');
+        var socket = io.connect(url(), {reconnection: false});
+
+        if (window().document.hasFocus()) {
+          socket.emit('unpause');
+        }
+
+        socket.on('connect', function () {
+          each(onConnectCallbacks(), function (callback) {
+            callback();
+          });
+        });
+        socket.on('disconnect', function () {
+          each(onDisconnectCallbacks(), function (callback) {
+            callback();
+          });
+        });
+        socket.on('playerId', function (playerId) {
+          socket.playerId = playerId;
+        });
+        socket.on('initialState', function (state) {
+          each(onSetupCallbacks(), function (callback) {
+            callback(state);
+          });
+        });
+        socket.on('updateState', function (state) {
+          each(onPacketCallbacks(), function (callback) {
+            callback(state);
+          });
+        });
+        socket.on('error', function (data) {
+          each(onErrorCallbacks(), function (callback) {
+            callback(data);
+          });
+        });
+
+        $(window()).on('blur', function () { socket.emit('pause'); });
+        $(window()).on('focus', function () { socket.emit('unpause'); });
+        $(window()).on('mousedown', function () { socket.emit('unpause'); });
+        $(window()).on('mouseup', function () { socket.emit('unpause'); });
+
+        each(inputModes(), function (inputMode) {
+          controls.push(inputMode.InputMode());
+        });
+
+        var id = setInterval(configureEmitFunction (socket), 1000 / 120);
+        socket.on('disconnect', function () {
+          clearInterval(id);
+        });
+      }
+    };
+  }
+};
+},{"lodash":6,"socket.io-client":11,"zepto-browserify":84}],73:[function(require,module,exports){
+'use strict';
+
+var clone = require('lodash').clone;
+
+module.exports = {
+    type: 'PendingAcknowledgements',
+    func: function () {
+        var acks = [];
+
+        var reset = function () {
+            acks = [];
+        };
+
+        return {
+            flush: function () {
+                var pending = clone(acks);
+
+                reset();
+
+                return pending;
+            },
+            add: function (packetId) {
+                acks.push({ id: packetId, rcvdTimestamp: Date.now(), names: []});
+            },
+            ackLast: function (name) {
+                acks[acks.length - 1].names.push(name);
+            }
+        };
+    }
+};
+},{"lodash":6}],74:[function(require,module,exports){
+'use strict';
+
+var isEqual = require('lodash').isEqual;
+
+module.exports = {
+  type: 'StateTrackerHelpers',
+  func: function () {
+    return {
+      equals: function (expectedValue) {
+        return function (currentValue) {
+          return isEqual(currentValue, expectedValue);
+        };
+      }
+    };
+  }
+};
+},{"lodash":6}],75:[function(require,module,exports){
+'use strict';
+
+var each = require('lodash').each;
+var isArray = require('lodash').isArray;
+var isEqual = require('lodash').isEqual;
+var clone = require('lodash').clone;
+var where = require('lodash').where;
+
+module.exports = {
+  type: 'StateTracker',
+  func: function () {
+    var priorState;
+    var currentState;
+    var changes = [];
+
+    var invokeCallback = function (callback, model, priorModel, data) {
+      if (isArray(data)) {
+        var args = clone(data);
+        args.unshift(model, priorModel);
+        callback.apply(this, args);
+      } else {
+        callback(model, priorModel, data);
+      }
+    };
+
+    var hasChanged = function (f) {
+      if (priorState === undefined) { return true; }
+
+      return !isEqual(f(priorState), f(currentState));
+    };
+
+    var currentValue = function (f) {
+      if (currentState === undefined) {
+        return undefined;
+      }
+
+      return f(currentState);
+    };
+    var priorValue = function (f) {
+      if (priorState === undefined) {
+        return undefined;
+      }
+
+      return f(priorState);
+    };
+    var currentElement = function (f, model) {
+      if (currentState === undefined) {
+        return undefined;
+      }
+
+      return where(f(currentState), {id: model.id})[0];
+    };
+    var priorElement = function (f, model) {
+      if (priorState === undefined) {
+        return undefined;
+      }
+
+      return where(f(priorState), {id: model.id})[0];
+    };
+    var elementAdded = function (f, model) {
+      return (where(f(priorState), {id: model.id}).length === 0);
+    };
+    var elementRemoved = function (f, model) {
+      return (where(f(currentState), {id: model.id}).length === 0);
+    };
+    var elementChanged = function (f, model) {
+      if (priorState === undefined) { return true; }
+
+      var current = where(f(currentState), {id: model.id});
+      var prior = where(f(priorState), {id: model.id});
+      return !isEqual(current, prior);
+    };
+    var handleObjects = function (change) {
+      if (hasChanged(change.focus)) {
+        if (!change.when) {
+          invokeCallback(change.callback, currentValue(change.focus), priorValue(change.focus), change.data);
+          return;
+        }
+
+        if (change.when(currentValue(change.focus))) {
+          invokeCallback(change.callback, currentValue(change.focus), priorValue(change.focus), change.data);
+        }
+      }
+    };
+    var handleArrays = function (change) {
+      each(change.operatesOn(change.focus), function (model) {
+        if (change.detectionFunc(change.focus, model)) {
+          invokeCallback(change.callback, currentElement(change.focus, model), priorElement(change.focus, model), change.data);
+        }
+      });
+    };
+    var sendCurrentContentsNow = function (change) {
+      invokeCallback(change.callback, currentValue(change.focus), undefined, change.data);
+    };
+
+    var handle = {
+      'array': handleArrays,
+      'object': handleObjects
+    };
+
+    var detectChangesAndNotifyObservers = function () {
+      each(changes, function (change) {
+        handle[change.type](change);
+      });
+    };
+
+    return {
+      get: function (model) {
+        return currentValue(model);
+      },
+      updateState: function (newState) {
+        priorState = currentState;
+        currentState = newState;
+
+        detectChangesAndNotifyObservers();
+      },
+      onChangeOf: function (model, callback, data) {
+        var change = {
+          type: 'object',
+          focus: model,
+          callback: callback,
+          data: data
+        };
+
+        changes.push(change);
+      },
+      onChangeTo: function (model, condition, callback, data) {
+        var change = {
+          type: 'object',
+          focus: model,
+          'when': condition,
+          callback: callback,
+          data: data
+        };
+
+        handleObjects(change);
+        changes.push(change);
+      },
+      onElementChanged: function (focusArray, callback, data) {
+        var change = {
+          type: 'array',
+          focus: focusArray,
+          callback: callback,
+          detectionFunc: elementChanged,
+          operatesOn: currentValue,
+          data: data
+        };
+
+        changes.push(change);
+      },
+      onElementAdded: function (focusArray, onCallback, existingCallback, data) {
+        var change = {
+          type: 'array',
+          focus: focusArray,
+          callback: onCallback,
+          detectionFunc: elementAdded,
+          operatesOn: currentValue,
+          data: data
+        };
+
+        changes.push(change);
+        sendCurrentContentsNow({
+          focus: focusArray,
+          callback: existingCallback,
+          data: data
+        });
+      },
+      onElementRemoved: function (focusArray, callback, data) {
+        var change = {
+          type: 'array',
+          focus: focusArray,
+          callback: callback,
+          detectionFunc: elementRemoved,
+          operatesOn: priorValue,
+          data: data
+        };
+
+        changes.push(change);
+      }
+    };
+  }
+};
+},{"lodash":6}],76:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+  deps: ['AspectRatio', 'WidescreenMinimumMargin', 'Window'],
+  type: 'Dimensions',
+  func: function (ratio, minMargin, window) {
+    return {
+      get: function () {
+        var actualWidth = window().innerWidth;
+        var actualHeight = window().innerHeight;
+        var heightBasedOnWidth = Math.round(actualWidth / ratio());
+        var widthBasedOnHeight = Math.round(actualHeight * ratio());
+        var totalMargin = minMargin() + minMargin();
+
+        var usableWidth;
+        var usableHeight;
+        var orientation;
+
+        if (heightBasedOnWidth >= actualHeight) {
+          if (widthBasedOnHeight + totalMargin > actualWidth) {
+            usableWidth = actualWidth - totalMargin;
+            usableHeight = heightBasedOnWidth;
+          } else {
+            usableWidth = widthBasedOnHeight;
+            usableHeight = actualHeight;
+          }
+
+          orientation = 'landscape';
+        } else {
+          if (heightBasedOnWidth + totalMargin > actualHeight) {
+            usableWidth = widthBasedOnHeight;
+            usableHeight = actualHeight - totalMargin;
+          } else {
+            usableWidth = actualWidth;
+            usableHeight = heightBasedOnWidth;
+          }
+
+          orientation = 'portrait';
+        }
+
+        return {
+          usableWidth: usableWidth,
+          usableHeight: usableHeight,
+          marginSides: Math.round(actualWidth - usableWidth) / 2,
+          marginTopBottom: Math.round(actualHeight - usableHeight) / 2,
+          orientation: orientation,
+          screenWidth: actualWidth,
+          screenHeight: actualHeight,
+          ratio: ratio()
+        };
+      }
+    };
+  }
+};
+},{}],77:[function(require,module,exports){
+'use strict';
+
+var each = require('lodash').each;
+var reject = require('lodash').reject;
+
+module.exports = {
+  deps: ['DefinePlugin'],
+  type: 'OnInitialise',
+  func: function (define) {
+    var effects = [];
+
+    return function () {
+      define()('OnEachFrame', function () {
+        return function (delta) {
+          each(effects, function (effect) {
+            effect.tick(delta);
+          });
+
+          effects = reject(effects, function (effect) {
+            return !effect.isAlive();
+          });
+        };
+      });
+
+      define()('RegisterEffect', function () {
+        return {
+          register: function (effect) {
+            effects.push(effect);
+          }
+        };
+      });
+    };
+  }
+};
+},{"lodash":6}],78:[function(require,module,exports){
+'use strict';
+
+var each = require('lodash').each;
+
+module.exports = {
+  deps: ['Window', 'OnEachFrame', 'StateTracker'],
+  type: 'UpdateLoop',
+  func: function (window, frames, tracker) {
+    var priorStep = Date.now();
+
+    var paused = function (state) { return state.ensemble.paused; };
+
+    return {
+      run: function () {
+        if (tracker().get(paused)) {
+          priorStep = Date.now();
+        } else {
+          var now = Date.now();
+          var delta = (now - priorStep) / 1000;
+          priorStep = Date.now();
+
+          each(frames(), function(frame) {
+            frame(delta);
+          });
+        }
+
+        window().requestAnimationFrame(this.run.bind(this));
+      }
+    };
+    }
+};
+},{"lodash":6}],79:[function(require,module,exports){
+'use strict';
+
+var screenfull = require('screenfull');
+var $ = require('zepto-browserify').$;
+
+module.exports = {
+  type: 'View',
+  func: function () {
+    return function () {
+      $('.fullscreen').on('click', function () {
+        if (screenfull.enabled) {
+          screenfull.toggle();
+        }
+      });
+    };
+  }
+};
+},{"screenfull":10,"zepto-browserify":84}],80:[function(require,module,exports){
+'use strict';
+
+var iconSize = 32;
+var position = function (slot) { return slot * iconSize; };
+var iconTop = function () { return 0; };
+var textTop = function () { return +6; };
+
+var landscape = function ($) {
+  var pos = 0;
+  $('.fullscreen').css('top', position(pos) - iconTop() + 'px').css('right', '0');
+  pos += 1;
+  $('.sound-on').css('top', position(pos) - iconTop() + 'px').css('right', '0');
+  $('.sound-off').css('top', position(pos) - iconTop() + 'px').css('right', '0');
+  pos += 1;
+  $('.disconnected').css('top', position(pos) - iconTop() + 'px').css('right', '0');
+  pos += 1;
+  $('.paused').css('top', position(pos) - iconTop() + 'px').css('right', '0');
+  pos += 1;
+  $('.players').css('top', position(pos) - iconTop() + 'px').css('right', '0');
+  pos += 1;
+  $('.player-count').css('top', position(pos) - textTop() + 'px').css('right', '0');
+  pos += 1;
+  $('.observers').css('top', position(pos) - iconTop() + 'px').css('right', '0');
+  pos += 1;
+  $('.observer-count').css('top', position(pos) - textTop() + 'px').css('right', '0');
+  pos += 1;
+};
+
+var portrait = function ($) {
+  var pos = 0;
+  $('.fullscreen').css('right', position(pos) + 'px').css('top', iconTop() + 'px');
+  pos += 1;
+  $('.sound-on').css('right', position(pos) + 'px').css('top', iconTop() + 'px');
+  $('.sound-off').css('right', position(pos) + 'px').css('top', iconTop() + 'px');
+  pos += 1;
+  $('.disconnected').css('right', position(pos) + 'px').css('top', iconTop() + 'px');
+  pos += 1;
+  $('.paused').css('right', position(pos) + 'px').css('top', iconTop() + 'px');
+  pos += 1;
+  $('.players').css('right', position(pos) + 'px').css('top', iconTop() + 'px');
+  pos += 1;
+  $('.player-count').css('right', position(pos) + 'px').css('top', textTop() + 'px');
+  pos += 1;
+  $('.observers').css('right', position(pos) + 'px').css('top', iconTop() + 'px');
+  pos += 1;
+  $('.observer-count').css('right', position(pos) + 'px').css('top', textTop() + 'px');
+  pos += 1;
+};
+
+module.exports = {
+  type: 'OnResize',
+  func: function () {
+    var $ = require('zepto-browserify').$;
+
+    return function (dims) {
+      if (dims.orientation === 'landscape') {
+        landscape($);
+      } else {
+        portrait($);
+      }
+    };
+  }
+};
+},{"zepto-browserify":84}],81:[function(require,module,exports){
+'use strict';
+
+module.exports = {
+  deps: ['OnPause', 'OnResume', 'StateTrackerHelpers', 'StateTracker'],
+  type: 'View',
+  func: function (onPauseCallbacks, onResumeCallbacks, trackerHelpers, tracker) {
+    var each = require('lodash').each;
+    var $ = require('zepto-browserify').$;
+    var equals = trackerHelpers().equals;
+
+    var pause = function () {
+      $('.paused').show();
+      $('#paused').show();
+
+      each(onPauseCallbacks(), function(onPauseCallback) {
+        onPauseCallback();
+      });
+    };
+    var resume = function () {
+      $('.paused').hide();
+      $('#paused').hide();
+
+      each(onResumeCallbacks(), function(onResumeCallback) {
+        onResumeCallback();
+      });
+    };
+
+    var paused = function (state) { return state.ensemble.paused; };
+
+    return function () {
+      tracker().onChangeTo(paused, equals(true), pause);
+      tracker().onChangeTo(paused, equals(false), resume);
+    };
+  }
+};
+},{"lodash":6,"zepto-browserify":84}],82:[function(require,module,exports){
+'use strict';
+
+var numeral = require('numeral');
+
+module.exports = {
+  type: 'View',
+  deps: ['StateTracker'],
+  func: function (tracker) {
+    var $ = require('zepto-browserify').$;
+
+    var updatePlayerCount = function (currentValue) {
+      $('#player-count').text(numeral(currentValue).format('0a'));
+    };
+    var updateObserverCount = function (currentValue) {
+      $('#observer-count').text(numeral(currentValue).format('0a'));
+    };
+
+    var playerCount = function (state) { return state.ensemble.players; };
+    var observerCount = function (state) { return state.ensemble.observers; };
+
+    return function () {
+      tracker().onChangeOf(playerCount, updatePlayerCount);
+      tracker().onChangeOf(observerCount, updateObserverCount);
+    };
+  }
+};
+},{"numeral":7,"zepto-browserify":84}],83:[function(require,module,exports){
+'use strict';
+
+var each = require('lodash').each;
+var $ = require('zepto-browserify').$;
+
+module.exports = {
+  type: 'View',
+  deps: ['OnMute', 'OnUnmute'],
+  func: function (onMuteCallbacks, onUnmuteCallbacks) {
+    return function () {
+      $('.sound-off').hide();
+      $('.sound-on').on('click', function () {
+        $('.sound-on').hide();
+        $('.sound-off').show();
+
+        each(onMuteCallbacks, function(onMuteCallback) {
+          onMuteCallback();
+        });
+      });
+      $('.sound-off').on('click', function () {
+        $('.sound-off').hide();
+        $('.sound-on').show();
+
+        each(onUnmuteCallbacks, function(onUnmuteCallback) {
+          onUnmuteCallback();
+        });
+      });
+    };
+  }
+};
+},{"lodash":6,"zepto-browserify":84}],84:[function(require,module,exports){
 /* Zepto v1.1.6 - zepto event ajax form ie - zeptojs.com/license */
 
 var Zepto = (function() {
@@ -22166,995 +23131,6 @@ exports.$ = window.$
   }
 })(Zepto)
 ;
-},{}],62:[function(require,module,exports){
-'use strict';
-
-//jshint maxparams: 6
-module.exports = {
-  type: 'ClientSideAssembler',
-  deps: ['SocketBehaviour', 'Dimensions', 'Window', 'UpdateLoop', 'OnResize', 'OnInitialise'],
-  func: function (socketBehaviour, dimensions, window, updateLoop, resizeCallbacks, onInitialiseCallbacks) {
-
-    var each = require('lodash').each;
-    var $ = require('zepto-browserify').$;
-
-    var resizeCanvas = function () {
-      var dims = dimensions().get();
-
-      each(resizeCallbacks(), function(resizeCallback) {
-        resizeCallback(dims);
-      });
-    };
-
-    return {
-      assembleAndRun: function () {
-        each(onInitialiseCallbacks(), function (callback) {
-          callback();
-        });
-
-        socketBehaviour().connect();
-
-        $(window()).on('load resize', resizeCanvas);
-        updateLoop().run();
-      }
-    };
-  }
-};
-},{"lodash":6,"zepto-browserify":61}],63:[function(require,module,exports){
-'use strict';
-
-var plugins = require('plug-n-play').configure(['View', 'InputMode', 'OnMute', 'OnPause', 'OnResume', 'OnUnmute', 'OnConnect', 'OnDisconnect', 'OnEachFrame', 'OnResize', 'OnPacket', 'OnSetup', 'OnError', 'OnInitialise']);
-
-module.exports = {
-  load: plugins.load,
-  set: plugins.set,
-  loadWindow: function (window) {
-    plugins.set('Window', window);
-  },
-  run: function () {
-    plugins.get('ClientSideAssembler').assembleAndRun();
-  },
-  loadDefaults: function () {
-    plugins.set('ServerUrl', 'http://localhost:3000/');
-    plugins.set('GameMode', 'game');
-    plugins.set('AspectRatio', 26 / 10);
-    plugins.set('WidescreenMinimumMargin', 32);
-    plugins.set('Element', 'canvas');
-    plugins.set('InputElement', 'input');
-
-    plugins.load(require('./ui/dimensions'));
-    plugins.load(require('./ui/effects'));
-    plugins.load(require('./events/on_connect'));
-    plugins.load(require('./events/on_disconnect'));
-    plugins.load(require('./events/on_resize'));
-    plugins.load(require('./events/acknowledge-packet'));
-    plugins.load(require('./events/initialise-state'));
-    plugins.load(require('./events/update-state'));
-    plugins.load(require('./events/initialise-views'));
-    plugins.load(require('./events/on-error'));
-    plugins.load(require('./state/tracker'));
-    plugins.load(require('./state/shortcuts'));
-    plugins.load(require('./input/keyboard'));
-    plugins.load(require('./update/loop'));
-    plugins.load(require('./socket/client'));
-    plugins.load(require('./socket/pending-acknowledgements'));
-
-    plugins.load(require('./views/fullscreen'));
-    plugins.load(require('./views/toggle_sound'));
-    plugins.load(require('./views/layout_icons'));
-    plugins.load(require('./views/player_observer_count'));
-    plugins.load(require('./views/pause_resume'));
-
-    plugins.load(require('./assembler'));
-  }
-};
-},{"./assembler":62,"./events/acknowledge-packet":64,"./events/initialise-state":65,"./events/initialise-views":66,"./events/on-error":67,"./events/on_connect":68,"./events/on_disconnect":69,"./events/on_resize":70,"./events/update-state":71,"./input/keyboard":72,"./socket/client":73,"./socket/pending-acknowledgements":74,"./state/shortcuts":75,"./state/tracker":76,"./ui/dimensions":77,"./ui/effects":78,"./update/loop":79,"./views/fullscreen":80,"./views/layout_icons":81,"./views/pause_resume":82,"./views/player_observer_count":83,"./views/toggle_sound":84,"plug-n-play":9}],64:[function(require,module,exports){
-'use strict';
-
-module.exports = {
-  type: 'OnPacket',
-  deps: ['PendingAcknowledgements'],
-  func: function (pendingAcknowledgements) {
-    return function (packet) {
-      pendingAcknowledgements().add(packet.id);
-    };
-  }
-};
-},{}],65:[function(require,module,exports){
-'use strict';
-
-module.exports = {
-  type: 'OnSetup',
-  deps: ['StateTracker'],
-  func: function (tracker) {
-    return function (state) {
-      tracker().updateState(state);
-    };
-  }
-};
-},{}],66:[function(require,module,exports){
-'use strict';
-
-var each = require('lodash').each;
-
-module.exports = {
-  type: 'OnSetup',
-  deps: ['View', 'Dimensions'],
-  func: function (views, dimensions) {
-    return function () {
-      var dims = dimensions().get();
-
-      each(views(), function(view) {
-        view(dims);
-      });
-    };
-  }
-};
-},{"lodash":6}],67:[function(require,module,exports){
-'use strict';
-
-module.exports = {
-  type: 'OnError',
-  func: function() {
-    return function(data) {
-      throw new Error(data);
-    };
-  }
-};
-},{}],68:[function(require,module,exports){
-'use strict';
-
-module.exports = {
-  type: 'OnConnect',
-  func: function () {
-    var $ = require('zepto-browserify').$;
-
-    return function () {
-      $('.disconnected').hide();
-    };
-  }
-};
-},{"zepto-browserify":61}],69:[function(require,module,exports){
-'use strict';
-
-module.exports = {
-  type: 'OnDisconnect',
-  func: function () {
-    var $ = require('zepto-browserify').$;
-
-    return function () {
-      $('.disconnected').show();
-    };
-  }
-};
-},{"zepto-browserify":61}],70:[function(require,module,exports){
-'use strict';
-
-module.exports = {
-  type: 'OnResize',
-  deps: ['Element', 'InputElement'],
-  func: function (element, inputElement) {
-    var $ = require('zepto-browserify').$;
-
-    return function (dims) {
-      $('#' + element()).css('margin-top', dims.marginTopBottom);
-      $('#' + element()).css('width', dims.usableWidth);
-      $('#' + element()).css('height', dims.usableHeight);
-
-      $('#' + inputElement()).css('width', dims.usableWidth);
-      $('#' + inputElement()).css('height', dims.usableHeight);
-    };
-  }
-};
-},{"zepto-browserify":61}],71:[function(require,module,exports){
-'use strict';
-
-module.exports = {
-  type: 'OnPacket',
-  deps: ['StateTracker'],
-  func: function (tracker) {
-    var lastReceivedId = 0;
-
-    return function (packet) {
-      if (packet.id <= lastReceivedId) {
-        return;
-      }
-      lastReceivedId = packet.id;
-
-      tracker().updateState(packet.gameState);
-    };
-  }
-};
-},{}],72:[function(require,module,exports){
-'use strict';
-
-module.exports = {
-  deps: ['Window', 'InputElement'],
-  type: 'InputMode',
-  func: function (window, element) {
-    var _ = require('lodash');
-    var $ = require('zepto-browserify').$;
-
-    return {
-      InputMode: function () {
-        var x = 0;
-        var y = 0;
-        var touches = [];
-        var keys = {};
-        var singlePressKeys = {};
-
-        var keyMap = function () {
-          var map = {
-            '9': 'tab',
-            '17': 'control',
-            '18': 'alt',
-            '27': 'escape',
-            '32': 'space',
-            '37': 'left',
-            '38': 'up',
-            '39': 'right',
-            '40': 'down'
-          };
-          var i = 0;
-
-          for (i = 48; i <= 122; i += 1) {
-            if (i > 57 && i < 65) { continue; }
-            if (i > 90 && i < 97) { continue; }
-            if (map[i] !== undefined) {
-              continue;
-            }
-            map[i] = String.fromCharCode(i);
-          }
-
-          return map;
-        };
-
-        var mouseMap = function () {
-          return {
-            '1': 'button1',
-            '3': 'button2'
-          };
-        };
-
-        var singlePress = function (key) {
-          singlePressKeys[key] = true;
-        };
-
-        var press = function (key) {
-          keys[key] = true;
-        };
-
-        var release = function (key) {
-          keys[key] = false;
-        };
-
-        var bindToWindowEvents = function () {
-          $(window()).on('mousedown', function (e) {
-            press(mouseMap()[e.which]);
-            e.preventDefault();
-          });
-
-          $(window()).on('mouseup', function (e) {
-            release(mouseMap()[e.which]);
-            e.preventDefault();
-          });
-
-          var elementId = '#' + element();
-
-          $(elementId).on('mousemove', function (e) {
-            x = e.layerX;
-            y = e.layerY;
-          });
-
-          $(elementId).on('touchstart', function (e) {
-            _.each(e.touches, function (touch) {
-              var x = touch.clientX - touch.target.offsetLeft;
-              var y = touch.clientY - touch.target.offsetTop;
-              touches.push({ id: touch.identifier, x: x, y: y, force: touch.webkitForce || 1 });
-            });
-          });
-
-          $(elementId).on('touchmove', function (e) {
-            _.each(e.touches, function (touch) {
-              var x = touch.clientX - touch.target.offsetLeft;
-              var y = touch.clientY - touch.target.offsetTop;
-              touches.push({ id: touch.identifier, x: x, y: y, force: touch.webkitForce || 1 });
-            });
-          });
-
-          $(elementId).on('touchend', function (e) {
-            var ids = _.map(e.changedTouches, function (touch) { return touch.identifier; });
-            touches = _.reject(touches, function (touch) { return ids.indexOf(touch.id) !== -1; });
-          });
-
-          $(elementId).on('touchleave', function (e) {
-            var ids = _.map(e.changedTouches, function (touch) { return touch.identifier; });
-            touches = _.reject(touches, function (touch) { return ids.indexOf(touch.id) !== -1; });
-          });
-
-          $(elementId).on('touchcancel', function (e) {
-            var ids = _.map(e.changedTouches, function (touch) { return touch.identifier; });
-            touches = _.reject(touches, function (touch) { return ids.indexOf(touch.id) !== -1; });
-          });
-
-
-          $(window().document).keypress(function (e) {
-            if (e.metaKey) { return; }
-
-            singlePress(keyMap()[e.which]);
-            //to ensure that both keypress and keydown fire on the same event. We can work around this
-            //but we'll need to get a replicable scene (this is only a problem for the space key)
-            // e.preventDefault();
-          });
-
-          $(window().document).keydown(function (e) {
-            if (e.metaKey) { return; }
-
-            press(keyMap()[e.which]);
-            // e.preventDefault();
-          });
-
-          $(window().document).keyup(function (e) {
-            release(keyMap()[e.which]);
-          });
-        };
-
-        bindToWindowEvents();
-
-        return {
-          getCurrentState: function () {
-            var inputData = {
-              mouse: {
-                x: x,
-                y: y
-              },
-              touches: touches
-            };
-
-            var keysToSend = [];
-            _.each(keys, function (value, key) {
-              if (value) {
-                keysToSend.push(key);
-              }
-            });
-            inputData.keys = keysToSend;
-
-            var singlePressKeysToSend = [];
-            _.each(singlePressKeys, function (value, key) {
-              if (value) {
-                singlePressKeysToSend.push(key);
-              }
-              singlePressKeys[key] = false;
-            });
-            inputData.singlePressKeys = singlePressKeysToSend;
-
-            return inputData;
-          }
-        };
-      }
-    };
-  }
-};
-},{"lodash":6,"zepto-browserify":61}],73:[function(require,module,exports){
-'use strict';
-
-var each = require('lodash').each;
-var extend = require('lodash').extend;
-var $ = require('zepto-browserify').$;
-
-//jshint maxparams: 10
-module.exports = {
-  deps: ['Window', 'InputMode', 'GameMode', 'ServerUrl', 'OnConnect', 'OnDisconnect', 'PendingAcknowledgements', 'OnPacket', 'OnSetup', 'OnError'],
-  type: 'SocketBehaviour',
-  func: function (window, inputModes, gameMode, serverUrl, onConnectCallbacks, onDisconnectCallbacks, pendingAcknowledgements, onPacketCallbacks, onSetupCallbacks, onErrorCallbacks) {
-
-    var controls = [];
-
-    var configureEmitFunction = function (socket) {
-      return function () {
-        var packet = {
-          pendingAcks: pendingAcknowledgements().flush(),
-          sentTimestamp: Date.now()
-        };
-
-        each(controls, function (control) {
-          extend(packet, control.getCurrentState());
-        });
-
-        socket.emit('input', packet);
-      };
-    };
-
-    var url = function () {
-      return serverUrl() + gameMode() + '/primary';
-    };
-
-    return {
-      connect: function () {
-        var io = require('socket.io-client');
-        var socket = io.connect(url(), {reconnection: false});
-
-        if (window().document.hasFocus()) {
-          socket.emit('unpause');
-        }
-
-        socket.on('connect', function () {
-          each(onConnectCallbacks(), function (callback) {
-            callback();
-          });
-        });
-        socket.on('disconnect', function () {
-          each(onDisconnectCallbacks(), function (callback) {
-            callback();
-          });
-        });
-        socket.on('playerId', function (playerId) {
-          socket.playerId = playerId;
-        });
-        socket.on('initialState', function (state) {
-          each(onSetupCallbacks(), function (callback) {
-            callback(state);
-          });
-        });
-        socket.on('updateState', function (state) {
-          each(onPacketCallbacks(), function (callback) {
-            callback(state);
-          });
-        });
-        socket.on('error', function (data) {
-          each(onErrorCallbacks(), function (callback) {
-            callback(data);
-          });
-        });
-
-        $(window()).on('blur', function () { socket.emit('pause'); });
-        $(window()).on('focus', function () { socket.emit('unpause'); });
-        $(window()).on('mousedown', function () { socket.emit('unpause'); });
-        $(window()).on('mouseup', function () { socket.emit('unpause'); });
-
-        each(inputModes(), function (inputMode) {
-          controls.push(inputMode.InputMode());
-        });
-
-        var id = setInterval(configureEmitFunction (socket), 1000 / 120);
-        socket.on('disconnect', function () {
-          clearInterval(id);
-        });
-      }
-    };
-  }
-};
-},{"lodash":6,"socket.io-client":11,"zepto-browserify":61}],74:[function(require,module,exports){
-'use strict';
-
-var clone = require('lodash').clone;
-
-module.exports = {
-    type: 'PendingAcknowledgements',
-    func: function () {
-        var acks = [];
-
-        var reset = function () {
-            acks = [];
-        };
-
-        return {
-            flush: function () {
-                var pending = clone(acks);
-
-                reset();
-
-                return pending;
-            },
-            add: function (packetId) {
-                acks.push({ id: packetId, rcvdTimestamp: Date.now(), names: []});
-            },
-            ackLast: function (name) {
-                acks[acks.length - 1].names.push(name);
-            }
-        };
-    }
-};
-},{"lodash":6}],75:[function(require,module,exports){
-'use strict';
-
-var isEqual = require('lodash').isEqual;
-
-module.exports = {
-  type: 'StateTrackerHelpers',
-  func: function () {
-    return {
-      equals: function (expectedValue) {
-        return function (currentValue) {
-          return isEqual(currentValue, expectedValue);
-        };
-      }
-    };
-  }
-};
-},{"lodash":6}],76:[function(require,module,exports){
-'use strict';
-
-var each = require('lodash').each;
-var isArray = require('lodash').isArray;
-var isEqual = require('lodash').isEqual;
-var clone = require('lodash').clone;
-var where = require('lodash').where;
-
-module.exports = {
-  type: 'StateTracker',
-  func: function () {
-    var priorState;
-    var currentState;
-    var changes = [];
-
-    var invokeCallback = function (callback, model, priorModel, data) {
-      if (isArray(data)) {
-        var args = clone(data);
-        args.unshift(model, priorModel);
-        callback.apply(this, args);
-      } else {
-        callback(model, priorModel, data);
-      }
-    };
-
-    var hasChanged = function (f) {
-      if (priorState === undefined) { return true; }
-
-      return !isEqual(f(priorState), f(currentState));
-    };
-
-    var currentValue = function (f) {
-      if (currentState === undefined) {
-        return undefined;
-      }
-
-      return f(currentState);
-    };
-    var priorValue = function (f) {
-      if (priorState === undefined) {
-        return undefined;
-      }
-
-      return f(priorState);
-    };
-    var currentElement = function (f, model) {
-      if (currentState === undefined) {
-        return undefined;
-      }
-
-      return where(f(currentState), {id: model.id})[0];
-    };
-    var priorElement = function (f, model) {
-      if (priorState === undefined) {
-        return undefined;
-      }
-
-      return where(f(priorState), {id: model.id})[0];
-    };
-    var elementAdded = function (f, model) {
-      return (where(f(priorState), {id: model.id}).length === 0);
-    };
-    var elementRemoved = function (f, model) {
-      return (where(f(currentState), {id: model.id}).length === 0);
-    };
-    var elementChanged = function (f, model) {
-      if (priorState === undefined) { return true; }
-
-      var current = where(f(currentState), {id: model.id});
-      var prior = where(f(priorState), {id: model.id});
-      return !isEqual(current, prior);
-    };
-    var handleObjects = function (change) {
-      if (hasChanged(change.focus)) {
-        if (!change.when) {
-          invokeCallback(change.callback, currentValue(change.focus), priorValue(change.focus), change.data);
-          return;
-        }
-
-        if (change.when(currentValue(change.focus))) {
-          invokeCallback(change.callback, currentValue(change.focus), priorValue(change.focus), change.data);
-        }
-      }
-    };
-    var handleArrays = function (change) {
-      each(change.operatesOn(change.focus), function (model) {
-        if (change.detectionFunc(change.focus, model)) {
-          invokeCallback(change.callback, currentElement(change.focus, model), priorElement(change.focus, model), change.data);
-        }
-      });
-    };
-    var sendCurrentContentsNow = function (change) {
-      invokeCallback(change.callback, currentValue(change.focus), undefined, change.data);
-    };
-
-    var handle = {
-      'array': handleArrays,
-      'object': handleObjects
-    };
-
-    var detectChangesAndNotifyObservers = function () {
-      each(changes, function (change) {
-        handle[change.type](change);
-      });
-    };
-
-    return {
-      get: function (model) {
-        return currentValue(model);
-      },
-      updateState: function (newState) {
-        priorState = currentState;
-        currentState = newState;
-
-        detectChangesAndNotifyObservers();
-      },
-      onChangeOf: function (model, callback, data) {
-        var change = {
-          type: 'object',
-          focus: model,
-          callback: callback,
-          data: data
-        };
-
-        changes.push(change);
-      },
-      onChangeTo: function (model, condition, callback, data) {
-        var change = {
-          type: 'object',
-          focus: model,
-          'when': condition,
-          callback: callback,
-          data: data
-        };
-
-        handleObjects(change);
-        changes.push(change);
-      },
-      onElementChanged: function (focusArray, callback, data) {
-        var change = {
-          type: 'array',
-          focus: focusArray,
-          callback: callback,
-          detectionFunc: elementChanged,
-          operatesOn: currentValue,
-          data: data
-        };
-
-        changes.push(change);
-      },
-      onElementAdded: function (focusArray, onCallback, existingCallback, data) {
-        var change = {
-          type: 'array',
-          focus: focusArray,
-          callback: onCallback,
-          detectionFunc: elementAdded,
-          operatesOn: currentValue,
-          data: data
-        };
-
-        changes.push(change);
-        sendCurrentContentsNow({
-          focus: focusArray,
-          callback: existingCallback,
-          data: data
-        });
-      },
-      onElementRemoved: function (focusArray, callback, data) {
-        var change = {
-          type: 'array',
-          focus: focusArray,
-          callback: callback,
-          detectionFunc: elementRemoved,
-          operatesOn: priorValue,
-          data: data
-        };
-
-        changes.push(change);
-      }
-    };
-  }
-};
-},{"lodash":6}],77:[function(require,module,exports){
-'use strict';
-
-module.exports = {
-  deps: ['AspectRatio', 'WidescreenMinimumMargin', 'Window'],
-  type: 'Dimensions',
-  func: function (ratio, minMargin, window) {
-    return {
-      get: function () {
-        var actualWidth = window().innerWidth;
-        var actualHeight = window().innerHeight;
-        var heightBasedOnWidth = Math.round(actualWidth / ratio());
-        var widthBasedOnHeight = Math.round(actualHeight * ratio());
-        var totalMargin = minMargin() + minMargin();
-
-        var usableWidth;
-        var usableHeight;
-        var orientation;
-
-        if (heightBasedOnWidth >= actualHeight) {
-          if (widthBasedOnHeight + totalMargin > actualWidth) {
-            usableWidth = actualWidth - totalMargin;
-            usableHeight = heightBasedOnWidth;
-          } else {
-            usableWidth = widthBasedOnHeight;
-            usableHeight = actualHeight;
-          }
-
-          orientation = 'landscape';
-        } else {
-          if (heightBasedOnWidth + totalMargin > actualHeight) {
-            usableWidth = widthBasedOnHeight;
-            usableHeight = actualHeight - totalMargin;
-          } else {
-            usableWidth = actualWidth;
-            usableHeight = heightBasedOnWidth;
-          }
-
-          orientation = 'portrait';
-        }
-
-        return {
-          usableWidth: usableWidth,
-          usableHeight: usableHeight,
-          marginSides: Math.round(actualWidth - usableWidth) / 2,
-          marginTopBottom: Math.round(actualHeight - usableHeight) / 2,
-          orientation: orientation,
-          screenWidth: actualWidth,
-          screenHeight: actualHeight,
-          ratio: ratio()
-        };
-      }
-    };
-  }
-};
-},{}],78:[function(require,module,exports){
-'use strict';
-
-var each = require('lodash').each;
-var reject = require('lodash').reject;
-
-module.exports = {
-  deps: ['DefinePlugin'],
-  type: 'OnInitialise',
-  func: function (define) {
-    var effects = [];
-
-    return function () {
-      define()('OnEachFrame', function () {
-        return function (delta) {
-          each(effects, function (effect) {
-            effect.tick(delta);
-          });
-
-          effects = reject(effects, function (effect) {
-            return !effect.isAlive();
-          });
-        };
-      });
-
-      define()('RegisterEffect', function () {
-        return {
-          register: function (effect) {
-            effects.push(effect);
-          }
-        };
-      });
-    };
-  }
-};
-},{"lodash":6}],79:[function(require,module,exports){
-'use strict';
-
-var each = require('lodash').each;
-
-module.exports = {
-  deps: ['Window', 'OnEachFrame', 'StateTracker'],
-  type: 'UpdateLoop',
-  func: function (window, frames, tracker) {
-    var priorStep = Date.now();
-
-    var paused = function (state) { return state.ensemble.paused; };
-
-    return {
-      run: function () {
-        if (tracker().get(paused)) {
-          priorStep = Date.now();
-        } else {
-          var now = Date.now();
-          var delta = (now - priorStep) / 1000;
-          priorStep = Date.now();
-
-          each(frames(), function(frame) {
-            frame(delta);
-          });
-        }
-
-        window().requestAnimationFrame(this.run.bind(this));
-      }
-    };
-    }
-};
-},{"lodash":6}],80:[function(require,module,exports){
-'use strict';
-
-var screenfull = require('screenfull');
-var $ = require('zepto-browserify').$;
-
-module.exports = {
-  type: 'View',
-  func: function () {
-    return function () {
-      $('.fullscreen').on('click', function () {
-        if (screenfull.enabled) {
-          screenfull.toggle();
-        }
-      });
-    };
-  }
-};
-},{"screenfull":10,"zepto-browserify":61}],81:[function(require,module,exports){
-'use strict';
-
-var iconSize = 32;
-var position = function (slot) { return slot * iconSize; };
-var iconTop = function () { return 0; };
-var textTop = function () { return +6; };
-
-var landscape = function ($) {
-  var pos = 0;
-  $('.fullscreen').css('top', position(pos) - iconTop() + 'px').css('right', '0');
-  pos += 1;
-  $('.sound-on').css('top', position(pos) - iconTop() + 'px').css('right', '0');
-  $('.sound-off').css('top', position(pos) - iconTop() + 'px').css('right', '0');
-  pos += 1;
-  $('.disconnected').css('top', position(pos) - iconTop() + 'px').css('right', '0');
-  pos += 1;
-  $('.paused').css('top', position(pos) - iconTop() + 'px').css('right', '0');
-  pos += 1;
-  $('.players').css('top', position(pos) - iconTop() + 'px').css('right', '0');
-  pos += 1;
-  $('.player-count').css('top', position(pos) - textTop() + 'px').css('right', '0');
-  pos += 1;
-  $('.observers').css('top', position(pos) - iconTop() + 'px').css('right', '0');
-  pos += 1;
-  $('.observer-count').css('top', position(pos) - textTop() + 'px').css('right', '0');
-  pos += 1;
-};
-
-var portrait = function ($) {
-  var pos = 0;
-  $('.fullscreen').css('right', position(pos) + 'px').css('top', iconTop() + 'px');
-  pos += 1;
-  $('.sound-on').css('right', position(pos) + 'px').css('top', iconTop() + 'px');
-  $('.sound-off').css('right', position(pos) + 'px').css('top', iconTop() + 'px');
-  pos += 1;
-  $('.disconnected').css('right', position(pos) + 'px').css('top', iconTop() + 'px');
-  pos += 1;
-  $('.paused').css('right', position(pos) + 'px').css('top', iconTop() + 'px');
-  pos += 1;
-  $('.players').css('right', position(pos) + 'px').css('top', iconTop() + 'px');
-  pos += 1;
-  $('.player-count').css('right', position(pos) + 'px').css('top', textTop() + 'px');
-  pos += 1;
-  $('.observers').css('right', position(pos) + 'px').css('top', iconTop() + 'px');
-  pos += 1;
-  $('.observer-count').css('right', position(pos) + 'px').css('top', textTop() + 'px');
-  pos += 1;
-};
-
-module.exports = {
-  type: 'OnResize',
-  func: function () {
-    var $ = require('zepto-browserify').$;
-
-    return function (dims) {
-      if (dims.orientation === 'landscape') {
-        landscape($);
-      } else {
-        portrait($);
-      }
-    };
-  }
-};
-},{"zepto-browserify":61}],82:[function(require,module,exports){
-'use strict';
-
-module.exports = {
-  deps: ['OnPause', 'OnResume', 'StateTrackerHelpers', 'StateTracker'],
-  type: 'View',
-  func: function (onPauseCallbacks, onResumeCallbacks, trackerHelpers, tracker) {
-    var each = require('lodash').each;
-    var $ = require('zepto-browserify').$;
-    var equals = trackerHelpers().equals;
-
-    var pause = function () {
-      $('.paused').show();
-      $('#paused').show();
-
-      each(onPauseCallbacks(), function(onPauseCallback) {
-        onPauseCallback();
-      });
-    };
-    var resume = function () {
-      $('.paused').hide();
-      $('#paused').hide();
-
-      each(onResumeCallbacks(), function(onResumeCallback) {
-        onResumeCallback();
-      });
-    };
-
-    var paused = function (state) { return state.ensemble.paused; };
-
-    return function () {
-      tracker().onChangeTo(paused, equals(true), pause);
-      tracker().onChangeTo(paused, equals(false), resume);
-    };
-  }
-};
-},{"lodash":6,"zepto-browserify":61}],83:[function(require,module,exports){
-'use strict';
-
-var numeral = require('numeral');
-
-module.exports = {
-  type: 'View',
-  deps: ['StateTracker'],
-  func: function (tracker) {
-    var $ = require('zepto-browserify').$;
-
-    var updatePlayerCount = function (currentValue) {
-      $('#player-count').text(numeral(currentValue).format('0a'));
-    };
-    var updateObserverCount = function (currentValue) {
-      $('#observer-count').text(numeral(currentValue).format('0a'));
-    };
-
-    var playerCount = function (state) { return state.ensemble.players; };
-    var observerCount = function (state) { return state.ensemble.observers; };
-
-    return function () {
-      tracker().onChangeOf(playerCount, updatePlayerCount);
-      tracker().onChangeOf(observerCount, updateObserverCount);
-    };
-  }
-};
-},{"numeral":7,"zepto-browserify":61}],84:[function(require,module,exports){
-'use strict';
-
-var each = require('lodash').each;
-var $ = require('zepto-browserify').$;
-
-module.exports = {
-  type: 'View',
-  deps: ['OnMute', 'OnUnmute'],
-  func: function (onMuteCallbacks, onUnmuteCallbacks) {
-    return function () {
-      $('.sound-off').hide();
-      $('.sound-on').on('click', function () {
-        $('.sound-on').hide();
-        $('.sound-off').show();
-
-        each(onMuteCallbacks, function(onMuteCallback) {
-          onMuteCallback();
-        });
-      });
-      $('.sound-off').on('click', function () {
-        $('.sound-off').hide();
-        $('.sound-on').show();
-
-        each(onUnmuteCallbacks, function(onUnmuteCallback) {
-          onUnmuteCallback();
-        });
-      });
-    };
-  }
-};
-},{"lodash":6,"zepto-browserify":61}],85:[function(require,module,exports){
-arguments[4][61][0].apply(exports,arguments)
-},{"dup":61}]},{},[1]);
+},{}]},{},[1]);
 
 //# sourceMappingURL=game.js.map
