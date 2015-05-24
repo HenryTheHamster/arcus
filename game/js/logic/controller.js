@@ -26,8 +26,8 @@ module.exports = {
                     },
                 };
             },
-            fire: function(data) {
-
+            powerUp: function(data) {
+                // console.log('fire');
                 var get = state().get;
                 var pow = get('power');
                 var inc = get('powerInc');
@@ -36,42 +36,16 @@ module.exports = {
                 }
                 pow += inc;
 
-
-                
-                // var attackCooldown = get('attackCooldown');
-                // var rot = get('archer')('rotation') - Math.PI / 2;
-                // if (attackCooldown <= 0) {
-                //     // var arrows = get('arrows');
-                //     // var pos = get('archer')('pos');
-                //     // arrows.push({
-                //     //     id: sequence.next('arrows'),
-                //     //     pos: {
-                //     //         x: pos('x'),
-                //     //         y: pos('y')
-                //     //     },
-                //     //     vel: {
-                //     //         x: Math.cos(rot) * 100.0,
-                //     //         y: -Math.sin(rot) * 100.0
-                //     //     },
-                //     //     rotation: rot
-                //     // });
-                //     // return {
-                //     //     attackCooldown: 5,
-                //     //     arrows: arrows
-                //     // };
-                // }
                 return {
                     power: pow,
                     powerInc: inc
                 }
             },
-            release: function(data) {
-                console.log(data);
-            },
-            notFire: function(data) {
+            fire: function() {
+                console.log('Not Fire');
                 var get = state().get;
                 var pow = get('power');
-                if(pow > 0) {
+                if(true) {
                     var inc = get('powerInc');
                     // console.log(pow);
                     var rot = get('archer')('rotation') - Math.PI / 2;
@@ -97,7 +71,6 @@ module.exports = {
                         arrows: arrows
                     };
                 }
-              // console.log('Not Fire');
             }
         }
     }
