@@ -11,7 +11,7 @@ module.exports = {
     return function() {
       definePlugin()('StateSeed', function() {
         return {
-          archer: {pos: {x: 100, y: 450},
+          archer: {position: {x: 100, y: 300},
                    rotation: 0,
                    aim: {x: 0, y: 0} },
           cursor: {x: 0, y: 0},
@@ -21,7 +21,11 @@ module.exports = {
           enemies: [],
           data: {},
           power: 3,
-          powerInc: 2
+          powerIncrement: 2,
+          world: {
+            width: 1000,
+            height: 800
+          }
         };
       });
 
@@ -44,13 +48,13 @@ module.exports = {
 
           arrows.forEach(function(a) {
             if(a.live) {
-              a.vel.y -= gravity * delta;
-              a.pos.y -= arrow_speed * a.vel.y * delta;
-              a.pos.x += arrow_speed * a.vel.x * delta;
-              a.rot = -Math.atan(a.vel.y/a.vel.x);
+              a.velocity.y -= gravity * delta;
+              a.position.y -= arrow_speed * a.velocity.y * delta;
+              a.position.x += arrow_speed * a.velocity.x * delta;
+              a.rotation = -Math.atan(a.velocity.y/a.velocity.x);
               for(var i = enemies.length - 1; i >= 0; i--) {
-                var xDist = a.pos.x - enemies[i].pos.x;
-                var yDist = a.pos.y - enemies[i].pos.y;
+                var xDist = a.position.x - enemies[i].position.x;
+                var yDist = a.position.y - enemies[i].position.y;
                 if(Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2)) < 40) {
                   var e = enemies[i];
                   e.health -= 10;
@@ -64,7 +68,7 @@ module.exports = {
                   }
                 }
               }
-              if(a.pos.y > 500) {
+              if(a.position.y > 500) {
                 a.live = false;
               }
             }
@@ -80,13 +84,9 @@ module.exports = {
             enemyCooldown = 5;
             enemies.push({
                         id: sequence.next('enemies'),
-                        pos: {
+                        position: {
                             x: 1200,
-                            y: 500
-                        },
-                        col: {
-                            x: 10,
-                            y: 10
+                            y: 300
                         },
                         velocity: 100.0,
                         health: 20.0,
@@ -94,9 +94,9 @@ module.exports = {
                     });
           }
           enemies.forEach(function(e) {
-            e.pos.x -= e.velocity * delta;
+            e.position.x -= e.velocity * delta;
             e.arrows.forEach(function(a) {
-              a.pos.x -= e.velocity * delta;
+              a.position.x -= e.velocity * delta;
             });
           });
 
@@ -113,7 +113,7 @@ module.exports = {
           }
 
           return {
-            arrowsrows: arrows,
+            arrows: arrows,
             attackCooldown: attackCooldown,
             enemies: enemies,
             enemyCooldown: enemyCooldown

@@ -10,8 +10,8 @@ module.exports = {
         return {
             cursor: function(cx, cy, data) {
                 var get = state().get;
-                var pos = get('archer')('pos');
-                var rotation = Math.atan2(cy - pos('y'), cx - pos('x')) + Math.PI / 2;
+                var pos = get('archer')('position');
+                var rotation = Math.atan2(cy - pos('y'), cx - pos('x'));
                 return {
                     archer: {
                         rotation: rotation,
@@ -27,46 +27,46 @@ module.exports = {
                 };
             },
             powerUp: function(data) {
-                // console.log('fire');
+                
                 var get = state().get;
-                var pow = get('power');
-                var inc = get('powerInc');
-                if((pow >= max_power && inc > 0) || (pow <= 0 && inc < 0)) {
-                    inc = -inc;
+                var power = get('power');
+                var increment = get('powerIncrement');
+                if((power >= max_power && increment > 0) || (power <= 0 && increment < 0)) {
+                    increment = -increment;
                 }
-                pow += inc;
+                power += increment;
 
                 return {
-                    power: pow,
-                    powerInc: inc
+                    power: power,
+                    powerIncrement: increment
                 }
             },
             fire: function() {
-                console.log('Not Fire');
+                
                 var get = state().get;
-                var pow = get('power');
+                var power = get('power');
                 if(true) {
-                    var inc = get('powerInc');
+                    var increment = get('powerIncrement');
                     // console.log(pow);
-                    var rot = get('archer')('rotation') - Math.PI / 2;
+                    var rotation = get('archer')('rotation');
                     var arrows = get('arrows');
-                    var pos = get('archer')('pos');
+                    var position = get('archer')('position');
                     arrows.push({
                         id: sequence.next('arrows'),
-                        pos: {
-                            x: pos('x'),
-                            y: pos('y')
+                        position: {
+                            x: position('x'),
+                            y: position('y')
                         },
-                        vel: {
-                            x: Math.cos(rot) * pow,
-                            y: -Math.sin(rot) * pow
+                        velocity: {
+                            x: Math.cos(rotation) * power,
+                            y: -Math.sin(rotation) * power
                         },
-                        rot: rot,
+                        rotation: rotation,
                         live: true
                     });
                     return {
                         power: 0,
-                        powerInc: Math.abs(inc),
+                        powerIncrement: Math.abs(increment),
                         attackCooldown: 5,
                         arrows: arrows
                     };
