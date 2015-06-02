@@ -41,11 +41,15 @@ module.exports = {
       enemies[current.id].position.y = current.position.y;
     };
 
-    var updateArcher = function (current, prior, archer, aim) {
+    var updatePower = function (current, prior, power) {
+      power.scale.x = current;
+    };
+
+    var updateArcher = function (current, prior, archer, power) {
       archer.position.x = current.position.x;
       archer.position.y = current.position.y;
-      aim.position.x = current.aim.x;
-      aim.position.y = current.aim.y;
+      power.position.x = current.aim.x;
+      power.position.y = current.aim.y - 20;
       archer.rotation = current.rotation;
       // console.log(current.aim.x, current.aim.y);
 
@@ -74,6 +78,13 @@ module.exports = {
       return enemy;
     };
 
+    var createPower = function () {
+      var power = new PIXI.Graphics();
+      power.beginFill(0xB16161);
+      power.drawRect(0, 0, 1, 5);
+
+      return power;
+    };
 
     var createArcher = function () {
       var archer = new PIXI.Graphics();
@@ -137,10 +148,12 @@ module.exports = {
 
       var archer = createArcher();
       var aim = createAim();
+      var power = createPower();
 
       stage.addChild(createWorld());
       stage.addChild(archer);
       stage.addChild(aim);
+      stage.addChild(power);
 
       tracker().onElementAdded(theArrows, addArrow, function(data){}, stage);
       tracker().onElementAdded(theEnemies, addEnemy, function(data){}, stage);
@@ -148,7 +161,8 @@ module.exports = {
       tracker().onElementChanged(theEnemies, updateEnemy);
       tracker().onElementRemoved(theEnemies, killEnemy);
       tracker().onElementRemoved(theArrows, killArrow);
-      tracker().onChangeOf(theArcher, updateArcher, [archer, aim]);
+      tracker().onChangeOf(theArcher, updateArcher, [archer, power]);
+      tracker().onChangeOf(thePower, updatePower, power);
 
       define()('OnEachFrame', function () {
         return function () {
