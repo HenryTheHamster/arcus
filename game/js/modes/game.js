@@ -35,7 +35,9 @@ module.exports = {
           'button1': [
             {target: controller().fire, onRelease: true},
             {target: controller().powerUp}
-          ]
+          ],
+          'left': [{target: controller().left}],
+          'right': [{target: controller().right}]
         };
       });
 

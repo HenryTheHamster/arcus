@@ -8,6 +8,28 @@ module.exports = {
     func: function(state) {
         
         return {
+            left: function(data) {
+                var get = state().get;
+                var pos = get('archer')('position');
+                return {
+                    archer: {
+                        position: {
+                            x: pos('x') - 2,
+                        }
+                    }
+                }
+            },
+            right: function(data) {
+                var get = state().get;
+                var pos = get('archer')('position');
+                return {
+                    archer: {
+                        position: {
+                            x: pos('x') + 2,
+                        }
+                    }
+                }
+            },
             cursor: function(cx, cy, data) {
                 var get = state().get;
                 var pos = get('archer')('position');
