@@ -55,7 +55,7 @@ module.exports = {
               for(var i = enemies.length - 1; i >= 0; i--) {
                 var xDist = a.position.x - enemies[i].position.x;
                 var yDist = a.position.y - enemies[i].position.y;
-                if(Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2)) < 40) {
+                if(Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2)) < 20) {
                   var e = enemies[i];
                   e.health -= 10;
                   a.live = false;

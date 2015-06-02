@@ -1,14 +1,15 @@
 'use strict';
-
+var mixin = require('lodash').mixin;
 
 
 var PIXI = require('pixi.js');
 
 module.exports = {
   type: 'View',
-  deps: ['Element', 'Dimensions', 'StateTracker', 'StateTrackerHelpers', 'DefinePlugin'],
-  func: function (element, dimensions, tracker, helpers, define) {
+  deps: ['Element', 'Dimensions', 'StateTracker', 'StateTrackerHelpers', 'DefinePlugin', 'RegisterEffect'],
+  func: function (element, dimensions, tracker, helpers, define, effect) {
     var input, context;
+    var tempEffect = require('../../../supporting-libs/src/temporary_effect');
     var arrows = {};
     var enemies = {};
     var $ = require('zepto-browserify').$;
@@ -35,7 +36,7 @@ module.exports = {
       aim.position.x = current.aim.x;
       aim.position.y = current.aim.y;
       archer.rotation = current.rotation;
-      console.log(current.aim.x, current.aim.y);
+      // console.log(current.aim.x, current.aim.y);
 
     }
 
@@ -95,6 +96,26 @@ module.exports = {
       stage.addChild(enemies[current.id]);
     };
 
+    var killEnemy = function (current, prior) {
+      mixin(enemies[prior.id], tempEffect(5, 
+        function() {
+          enemies[prior.id].alpha -= 0.01;
+        }, function() {
+          delete enemies[prior.id];    
+        }));
+      effect().register(enemies[prior.id]);
+    };
+
+    var killArrow = function (current, prior) {
+      mixin(arrows[prior.id], tempEffect(5, 
+        function() {
+          arrows[prior.id].alpha -= 0.01;
+        }, function() {
+          delete arrows[prior.id];    
+        }));
+      effect().register(arrows[prior.id]);
+    };
+
 
     var offset;
     return function (dims) {
@@ -114,6 +135,8 @@ module.exports = {
       tracker().onElementAdded(theEnemies, addEnemy, function(data){}, stage);
       tracker().onElementChanged(theArrows, updateArrow);
       tracker().onElementChanged(theEnemies, updateEnemy);
+      tracker().onElementRemoved(theEnemies, killEnemy);
+      tracker().onElementRemoved(theArrows, killArrow);
       tracker().onChangeOf(theArcher, updateArcher, [archer, aim]);
 
       define()('OnEachFrame', function () {
