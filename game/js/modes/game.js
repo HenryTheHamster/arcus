@@ -13,7 +13,8 @@ module.exports = {
         return {
           archer: {position: {x: 100, y: 300},
                    rotation: 0,
-                   aim: {x: 0, y: 0} },
+                   aim: {x: 0, y: 0},
+                   health: 100 }, 
           cursor: {x: 0, y: 0},
           arrows: [],
           attackCooldown: 90,
@@ -53,7 +54,6 @@ module.exports = {
         }
 
         var hitEnemy = function(arrow, enemy) {
-          
           var xDist = arrow.position.x - enemy.position.x;
           var yDist = arrow.position.y - enemy.position.y;
           if(Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2)) < 25) { // MAGIC NUMBER!!
@@ -62,14 +62,13 @@ module.exports = {
           return false;
         }
 
-
         return function (delta) {
           var arrows = state().get('arrows');
           var attackCooldown = state().get('attackCooldown');
           var enemies = state().get('enemies');
+          var archer = state().get('archer');
           var score = state().get('score');
           var enemyCooldown = state().get('enemyCooldown');
-
           arrows.forEach(function(a) {
             if(a.live) {
               a = updateArrow(a, delta);
@@ -114,10 +113,14 @@ module.exports = {
                     });
           }
           enemies.forEach(function(e) {
-            e.position.x -= e.velocity * delta;
             e.arrows.forEach(function(a) {
               a.position.x -= e.velocity * delta;
             });
+            if(e.position.x - archer('position')('x') < 10) {
+              
+            } else {
+              e.position.x -= e.velocity * delta;
+            }
           });
 
           for (i = 0; i < enemies.length; ++i) {
