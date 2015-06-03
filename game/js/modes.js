@@ -1,3 +1,3 @@
 'use strict';
 
-module.exports = 'ChampionArcher';
+module.exports = 'Arcus';

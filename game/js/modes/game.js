@@ -2,7 +2,7 @@
 var sequence = require('distributedlife-sequence');
 
 module.exports = {
-  type: 'ChampionArcher',
+  type: 'Arcus',
   deps: ['DefinePlugin', 'GameBehaviour-Controller'],
   func: function(definePlugin, controller) {
     var gravity = 50;
