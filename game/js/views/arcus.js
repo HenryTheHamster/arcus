@@ -10,6 +10,7 @@ module.exports = {
   func: function (element, dimensions, tracker, helpers, define, effect) {
     var input, context;
     var tempEffect = require('../../../supporting-libs/src/temporary_effect');
+    var mainTemplate = require('../../views/overlays/arcus.jade');
     var arrows = {};
     var enemies = {};
     var $ = require('zepto-browserify').$;
@@ -18,6 +19,7 @@ module.exports = {
     var theEnemies = function (state) { return state.enemies; };
     var theArrows = function (state) { return state.arrows; };
     var theData = function (state) { return state.data; };
+    var theScore = function (state) { return state.score; };
 
     var updateArrow = function (current, prior) {
       arrows[current.id].position.x = current.position.x;
@@ -33,6 +35,10 @@ module.exports = {
     var updatePower = function (current, prior, power) {
       power.scale.x = current;
     };
+
+    var updateScore = function (current, prior) {
+      $('#score')[0].innerText = current;
+    }
 
     var updateArcher = function (current, prior, archer, power) {
       archer.position.x = current.position.x;
@@ -139,6 +145,7 @@ module.exports = {
     var offset;
     return function (dims) {
 
+      $('#overlay').append(mainTemplate());
       var stage = new PIXI.Container();
       var renderer = PIXI.autoDetectRenderer(dims.usableWidth, dims.usableHeight);
       $('#' + element()).append(renderer.view);
@@ -161,6 +168,7 @@ module.exports = {
       tracker().onElementRemoved(theArrows, killArrow);
       tracker().onChangeOf(theArcher, updateArcher, [archer, power]);
       tracker().onChangeOf(thePower, updatePower, power);
+      tracker().onChangeOf(theScore, updateScore);
 
       define()('OnEachFrame', function () {
         return function () {

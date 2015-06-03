@@ -22,6 +22,7 @@ module.exports = {
           data: {},
           power: 3,
           powerIncrement: 2,
+          score: 0,
           world: {
             width: 1000,
             height: 800
@@ -55,7 +56,7 @@ module.exports = {
           
           var xDist = arrow.position.x - enemy.position.x;
           var yDist = arrow.position.y - enemy.position.y;
-          if(Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2)) < 30) { // MAGIC NUMBER!!
+          if(Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2)) < 25) { // MAGIC NUMBER!!
             return true;
           }
           return false;
@@ -66,6 +67,7 @@ module.exports = {
           var arrows = state().get('arrows');
           var attackCooldown = state().get('attackCooldown');
           var enemies = state().get('enemies');
+          var score = state().get('score');
           var enemyCooldown = state().get('enemyCooldown');
 
           arrows.forEach(function(a) {
@@ -78,6 +80,7 @@ module.exports = {
                   a.live = false;
                   e.arrows.push(a);
                   if(e.health <= 0) {
+                    score += 10; // MAGIC NUMBER !!
                     e.arrows.forEach(function(ea) {
                       ea.destroy = true;
                     });
@@ -130,6 +133,7 @@ module.exports = {
           }
 
           return {
+            score: score,
             arrows: arrows,
             attackCooldown: attackCooldown,
             enemies: enemies,
