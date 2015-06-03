@@ -96,6 +96,14 @@ module.exports = {
 
     }
 
+    var createGround = function () {
+      var world = new PIXI.Graphics();
+      world.beginFill(0x636363);
+      world.drawRect(0, 400, tracker().get(theWorldDimensions).width, tracker().get(theWorldDimensions).height - 400);
+
+      return world;
+    };
+
     var createWorld = function () {
       var world = new PIXI.Graphics();
       world.beginFill(0xF2ECDE);
@@ -151,6 +159,7 @@ module.exports = {
       var power = createPower();
 
       stage.addChild(createWorld());
+      stage.addChild(createGround());
       stage.addChild(archer);
       stage.addChild(aim);
       stage.addChild(power);
