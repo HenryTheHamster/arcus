@@ -42,6 +42,26 @@ module.exports = {
       });
 
       definePlugin()('ServerSideUpdate', ['StateAccess'], function(state) {
+
+        var updateArrow = function(arrow, delta) {
+          arrow.velocity.y -= gravity * delta;
+          arrow.position.y -= arrow_speed * arrow.velocity.y * delta;
+          arrow.position.x += arrow_speed * arrow.velocity.x * delta;
+          arrow.rotation = -Math.atan(arrow.velocity.y/arrow.velocity.x);
+          return arrow;
+        }
+
+        var hitEnemy = function(arrow, enemy) {
+          
+          var xDist = arrow.position.x - enemy.position.x;
+          var yDist = arrow.position.y - enemy.position.y;
+          if(Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2)) < 30) { // MAGIC NUMBER!!
+            return true;
+          }
+          return false;
+        }
+
+
         return function (delta) {
           var arrows = state().get('arrows');
           var attackCooldown = state().get('attackCooldown');
@@ -50,16 +70,11 @@ module.exports = {
 
           arrows.forEach(function(a) {
             if(a.live) {
-              a.velocity.y -= gravity * delta;
-              a.position.y -= arrow_speed * a.velocity.y * delta;
-              a.position.x += arrow_speed * a.velocity.x * delta;
-              a.rotation = -Math.atan(a.velocity.y/a.velocity.x);
+              a = updateArrow(a, delta);
               for(var i = enemies.length - 1; i >= 0; i--) {
-                var xDist = a.position.x - enemies[i].position.x;
-                var yDist = a.position.y - enemies[i].position.y;
-                if(Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2)) < 20) {
-                  var e = enemies[i];
-                  e.health -= 10;
+                var e = enemies[i];
+                if(hitEnemy(a, e)) {
+                  e.health -= 10; // MAGIC NUMBER !!
                   a.live = false;
                   e.arrows.push(a);
                   if(e.health <= 0) {
@@ -70,7 +85,7 @@ module.exports = {
                   }
                 }
               }
-              if(a.position.y > 500) {
+              if(a.position.y > 400) {
                 a.live = false;
               }
             }

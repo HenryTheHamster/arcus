@@ -5,10 +5,10 @@
 var entryPoint = require('ensemblejs-client');
 entryPoint.loadWindow((typeof window !== "undefined" ? window.window : typeof global !== "undefined" ? global.window : null));
 entryPoint.loadDefaults();
-entryPoint.load(require('./views/champion-archer'));
+entryPoint.load(require('./views/arcus'));
 entryPoint.run();
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./views/champion-archer":2,"ensemblejs-client":67}],2:[function(require,module,exports){
+},{"./views/arcus":2,"ensemblejs-client":67}],2:[function(require,module,exports){
 'use strict';
 var mixin = require('lodash').mixin;
 
