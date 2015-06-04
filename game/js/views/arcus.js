@@ -46,6 +46,7 @@ module.exports = {
       power.position.x = current.aim.x;
       power.position.y = current.aim.y - 20;
       archer.rotation = current.rotation;
+      $('#health')[0].innerText = current.health;
       // console.log(current.aim.x, current.aim.y);
 
     }

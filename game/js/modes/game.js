@@ -67,6 +67,7 @@ module.exports = {
           var attackCooldown = state().get('attackCooldown');
           var enemies = state().get('enemies');
           var archer = state().get('archer');
+          var health = state().get('archer')('health');
           var score = state().get('score');
           var enemyCooldown = state().get('enemyCooldown');
           arrows.forEach(function(a) {
@@ -109,18 +110,23 @@ module.exports = {
                         },
                         velocity: 100.0,
                         health: 20.0,
-                        arrows: []
+                        arrows: [],
+                        attackCooldown: 0.0
                     });
           }
           enemies.forEach(function(e) {
-            e.arrows.forEach(function(a) {
-              a.position.x -= e.velocity * delta;
-            });
             if(e.position.x - archer('position')('x') < 10) {
-              
+              if(e.attackCooldown <= 0.0 ) {
+                health -= 10;
+                e.attackCooldown = 2.0; // MAGIC NUMBER !!
+              }
             } else {
               e.position.x -= e.velocity * delta;
+              e.arrows.forEach(function(a) {
+                a.position.x -= e.velocity * delta;
+              });
             }
+            e.attackCooldown -= delta; // MAGIC NUMBER !!
           });
 
           for (i = 0; i < enemies.length; ++i) {
@@ -137,6 +143,9 @@ module.exports = {
 
           return {
             score: score,
+            archer: {
+              health: health
+            },
             arrows: arrows,
             attackCooldown: attackCooldown,
             enemies: enemies,

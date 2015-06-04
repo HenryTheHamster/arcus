@@ -57,6 +57,7 @@ module.exports = {
       power.position.x = current.aim.x;
       power.position.y = current.aim.y - 20;
       archer.rotation = current.rotation;
+      $('#health')[0].innerText = current.health;
       // console.log(current.aim.x, current.aim.y);
 
     }
@@ -198,7 +199,7 @@ var buf = [];
 var jade_mixins = {};
 var jade_interp;
 
-buf.push("<ul id=\"prior-scores\" class=\"prior-scores\"></ul><p id=\"score\" class=\"score\"></p>");;return buf.join("");
+buf.push("<ul id=\"prior-scores\" class=\"prior-scores\"></ul><p id=\"score\" class=\"score\"></p><p id=\"health\" class=\"health\"></p>");;return buf.join("");
 };
 },{"jade/runtime":91}],4:[function(require,module,exports){
 
