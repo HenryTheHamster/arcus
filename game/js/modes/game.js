@@ -19,7 +19,9 @@ module.exports = {
           arrows: [],
           attackCooldown: 90,
           enemyCooldown: 0,
+          allyCooldown: 0,
           enemies: [],
+          allies: [],
           data: {},
           power: 3,
           powerIncrement: 2,
@@ -39,7 +41,8 @@ module.exports = {
             {target: controller().powerUp}
           ],
           'left': [{target: controller().left}],
-          'right': [{target: controller().right}]
+          'right': [{target: controller().right}],
+          'space': [{target: controller().addAlly}]
         };
       });
 
@@ -66,10 +69,12 @@ module.exports = {
           var arrows = state().get('arrows');
           var attackCooldown = state().get('attackCooldown');
           var enemies = state().get('enemies');
+          var allies = state().get('allies');
           var archer = state().get('archer');
           var health = state().get('archer')('health');
           var score = state().get('score');
           var enemyCooldown = state().get('enemyCooldown');
+          var allyCooldown = state().get('allyCooldown');
           arrows.forEach(function(a) {
             if(a.live) {
               a = updateArrow(a, delta);
@@ -97,7 +102,7 @@ module.exports = {
           if(attackCooldown > 0) {
             attackCooldown = attackCooldown - 0.1;
           }
-
+          allyCooldown -= delta;
           if(enemyCooldown > 0) {
             enemyCooldown -= delta;
           } else {
@@ -105,7 +110,7 @@ module.exports = {
             enemies.push({
                         id: sequence.next('enemies'),
                         position: {
-                            x: 1200,
+                            x: 1200, // MAGIC NUMBER !!
                             y: 300
                         },
                         velocity: 100.0,
@@ -114,10 +119,46 @@ module.exports = {
                         attackCooldown: 0.0
                     });
           }
+
+          var enemyFrontline = 1200; // MAGIC NUMBER !!
+          if(enemies.length > 0) {
+            enemyFrontline = enemies[0].position.x;
+          }
+
+          var allyFrontline = archer('position')('x');
+          if(allies.length > 0 && allies[0].position.x > allyFrontline) {
+            allyFrontline = allies[0].position.x;
+          }
+
+          allies.forEach(function(a) {
+            if(enemyFrontline - a.position.x < 10) {
+              if(a.attackCooldown <= 0.0 ) {
+                enemies[0].health -= 5; // MAGIC NUMBER !!
+                if(enemies[0].health <= 0) {
+                  enemies[0].arrows.forEach(function(ea) {
+                    ea.destroy = true;
+                  });
+                  enemies[0].destroy = true;
+                }
+                a.attackCooldown = 2.0; // MAGIC NUMBER !!
+              }
+            } else {
+              a.position.x += a.velocity * delta;
+
+            }
+          });
+
           enemies.forEach(function(e) {
-            if(e.position.x - archer('position')('x') < 10) {
+            if(e.position.x - allyFrontline < 10) {
               if(e.attackCooldown <= 0.0 ) {
-                health -= 10;
+                if(archer('position')('x') == allyFrontline) {
+                  health -= 10; // MAGIC NUMBER !!
+                } else {
+                  allies[0].health -= 10; // MAGIC NUMBER !!
+                  if(allies[0].health <= 0) {
+                    allies[0].destroy = true;
+                  }
+                }
                 e.attackCooldown = 2.0; // MAGIC NUMBER !!
               }
             } else {
@@ -128,6 +169,12 @@ module.exports = {
             }
             e.attackCooldown -= delta; // MAGIC NUMBER !!
           });
+
+          for (i = 0; i < allies.length; ++i) {
+            if (allies[i].destroy) {
+              allies.splice(i--, 1);
+            }
+          }
 
           for (i = 0; i < enemies.length; ++i) {
             if (enemies[i].destroy) {
@@ -149,7 +196,9 @@ module.exports = {
             arrows: arrows,
             attackCooldown: attackCooldown,
             enemies: enemies,
-            enemyCooldown: enemyCooldown
+            allies: allies,
+            enemyCooldown: enemyCooldown,
+            allyCooldown: allyCooldown
           };
         };
       });

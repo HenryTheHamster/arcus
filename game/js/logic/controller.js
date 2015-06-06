@@ -93,6 +93,27 @@ module.exports = {
                         arrows: arrows
                     };
                 }
+            },
+            addAlly: function() {
+                var get = state().get;
+                var allies = get('allies');
+                var allyCooldown = get('allyCooldown');
+                if(allyCooldown <= 0) {
+                    allies.push({
+                        id: sequence.next('allies'),
+                        position: {
+                            x: -10,  // magic NUMBER !!
+                            y: 300 // magic NUMBER !!
+                        },
+                        velocity: 100.0,
+                        health: 25
+                    });
+                    allyCooldown = 2.0; // MAGIC NUMBER !!
+                }
+                return {
+                    allies: allies,
+                    allyCooldown: allyCooldown
+                };
             }
         }
     }

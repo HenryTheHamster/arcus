@@ -24,10 +24,12 @@ module.exports = {
     var mainTemplate = require('../../views/overlays/arcus.jade');
     var arrows = {};
     var enemies = {};
+    var allies = {};
     var $ = require('zepto-browserify').$;
     var thePower = function (state) { return state.power; };
     var theArcher = function (state) { return state.archer; };
     var theEnemies = function (state) { return state.enemies; };
+    var theAllies = function (state) { return state.allies; };
     var theArrows = function (state) { return state.arrows; };
     var theData = function (state) { return state.data; };
     var theScore = function (state) { return state.score; };
@@ -41,6 +43,11 @@ module.exports = {
     var updateEnemy = function (current, prior) {
       enemies[current.id].position.x = current.position.x;
       enemies[current.id].position.y = current.position.y;
+    };
+
+    var updateAlly = function (current, prior) {
+      allies[current.id].position.x = current.position.x;
+      allies[current.id].position.y = current.position.y;
     };
 
     var updatePower = function (current, prior, power) {
@@ -83,6 +90,14 @@ module.exports = {
       enemy.drawCircle(0, 0, 20);
 
       return enemy;
+    };
+
+    var createAlly = function () {
+      var ally = new PIXI.Graphics();
+      ally.beginFill(0xB16161);
+      ally.drawCircle(0, 0, 20);
+
+      return ally;
     };
 
     var createPower = function () {
@@ -128,6 +143,11 @@ module.exports = {
       stage.addChild(arrows[current.id]);
     };
 
+    var addAlly = function (current, prior, stage) {
+      allies[current.id] = createAlly();
+      stage.addChild(allies[current.id]);
+    };
+
     var addEnemy = function (current, prior, stage) {
       enemies[current.id] = createEnemy();
       stage.addChild(enemies[current.id]);
@@ -141,6 +161,16 @@ module.exports = {
           delete enemies[prior.id];    
         }));
       effect().register(enemies[prior.id]);
+    };
+
+    var killAlly = function (current, prior) {
+      mixin(allies[prior.id], tempEffect(5, 
+        function() {
+          allies[prior.id].alpha -= 0.01;
+        }, function() {
+          delete allies[prior.id];    
+        }));
+      effect().register(allies[prior.id]);
     };
 
     var killArrow = function (current, prior) {
@@ -174,10 +204,13 @@ module.exports = {
 
       tracker().onElementAdded(theArrows, addArrow, function(data){}, stage);
       tracker().onElementAdded(theEnemies, addEnemy, function(data){}, stage);
+      tracker().onElementAdded(theAllies, addAlly, function(data){}, stage);
       tracker().onElementChanged(theArrows, updateArrow);
+      tracker().onElementRemoved(theArrows, killArrow);
       tracker().onElementChanged(theEnemies, updateEnemy);
       tracker().onElementRemoved(theEnemies, killEnemy);
-      tracker().onElementRemoved(theArrows, killArrow);
+      tracker().onElementChanged(theAllies, updateAlly);
+      tracker().onElementRemoved(theAllies, killAlly);
       tracker().onChangeOf(theArcher, updateArcher, [archer, power]);
       tracker().onChangeOf(thePower, updatePower, power);
       tracker().onChangeOf(theScore, updateScore);
