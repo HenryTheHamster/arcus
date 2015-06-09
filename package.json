@@ -8,8 +8,8 @@
   },
   "dependencies": {
     "distributedlife-sequence": "^1.0.1",
-    "ensemblejs": "^2.1.0",
-    "ensemblejs-client": "^1.1.0",
+    "ensemblejs": "^2.1.2",
+    "ensemblejs-client": "^1.1.1",
     "pixi.js": "^3.0.6",
     "zepto-browserify": "^1.1.6-1"
   },

@@ -61,7 +61,7 @@ module.exports = {
     var createArrow = function () {
       var arrow = new PIXI.Graphics();
       arrow.beginFill(0x6D6B68);
-      arrow.drawRect(0, 0, 20, 2);
+      arrow.drawRect(0, 0, -20, 2);
       return arrow;
     };
 
@@ -98,11 +98,14 @@ module.exports = {
     };
 
     var createArcher = function () {
-      var archer = new PIXI.Graphics();
-      archer.pivot.y = 8;
-      archer.pivot.x = 16;
-      archer.beginFill(0x252222)
-      archer.drawRect(0, 0, 32, 16);
+      var archer = new PIXI.Sprite.fromImage('./game/assets/archer.png');
+      archer.scale.x = 0.1;
+      archer.scale.y = 0.1;
+      // var archer = new PIXI.Graphics();
+      archer.pivot.y = 256;
+      archer.pivot.x = 64;
+      // archer.beginFill(0x252222)
+      // archer.drawRect(0, 0, 32, 16);
       return archer;
 
     }

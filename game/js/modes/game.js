@@ -59,7 +59,7 @@ module.exports = {
         var hitEnemy = function(arrow, enemy) {
           var xDist = arrow.position.x - enemy.position.x;
           var yDist = arrow.position.y - enemy.position.y;
-          if(Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2)) < 25) { // MAGIC NUMBER!!
+          if(Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2)) < 20) { // MAGIC NUMBER!!
             return true;
           }
           return false;
