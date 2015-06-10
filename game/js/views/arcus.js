@@ -74,9 +74,24 @@ module.exports = {
     };
 
     var createEnemy = function () {
-      var enemy = new PIXI.Graphics();
-      enemy.beginFill(0xB16161);
-      enemy.drawCircle(0, 0, 20);
+      // var enemy = new PIXI.Graphics();
+      // enemy.beginFill(0xB16161);
+      // enemy.drawCircle(0, 0, 20);
+
+      var horseImages = ["./game/assets/horse01.png","./game/assets/horse02.png","./game/assets/horse03.png","./game/assets/horse04.png","./game/assets/horse05.png"];
+      var textureArray = [];
+
+      for (var i=0; i < 4; i++) {
+           var texture = PIXI.Texture.fromImage(horseImages[i]);
+           textureArray.push(texture);
+      };
+
+      var enemy = new PIXI.extras.MovieClip(textureArray);
+      enemy.scale.x = 0.1;
+      enemy.scale.y = 0.1;
+      enemy.animationSpeed = 0.2;
+
+      enemy.play();
 
       return enemy;
     };
