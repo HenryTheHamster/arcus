@@ -100,7 +100,7 @@ module.exports = {
           });
 
           if(attackCooldown > 0) {
-            attackCooldown = attackCooldown - 0.1;
+            attackCooldown = attackCooldown - 0.1; // MAGIC NUMBER !!
           }
           allyCooldown -= delta;
           if(enemyCooldown > 0) {
@@ -111,7 +111,7 @@ module.exports = {
                         id: sequence.next('enemies'),
                         position: {
                             x: 1200, // MAGIC NUMBER !!
-                            y: 300
+                            y: 350 // MAGIC NUMBER !!
                         },
                         velocity: 100.0,
                         health: 20.0,
