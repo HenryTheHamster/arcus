@@ -11,7 +11,7 @@ module.exports = {
     return function() {
       definePlugin()('StateSeed', function() {
         return {
-          archer: {position: {x: 100, y: 300},
+          archer: {position: {x: 100, y: 340},
                    rotation: 0,
                    aim: {x: 0, y: 0},
                    health: 100 }, 

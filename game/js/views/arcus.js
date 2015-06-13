@@ -6,11 +6,16 @@ var PIXI = require('pixi.js');
 
 module.exports = {
   type: 'View',
-  deps: ['Element', 'Dimensions', 'StateTracker', 'StateTrackerHelpers', 'DefinePlugin', 'RegisterEffect'],
-  func: function (element, dimensions, tracker, helpers, define, effect) {
+  deps: ['Element', 'Dimensions', 'StateTracker', 'StateTrackerHelpers', 'DefinePlugin', 'RegisterEffect', 'Window'],
+  func: function (element, dimensions, tracker, helpers, define, effect, window) {
     var input, context;
     var tempEffect = require('../../../supporting-libs/src/temporary_effect');
     var mainTemplate = require('../../views/overlays/arcus.jade');
+    var textureArray = [];
+    for (var i=1; i <= 5; i++) {
+         var texture = PIXI.Texture.fromImage("./game/assets/horse/horse_and_body" + i + ".png");
+         textureArray.push(texture);
+    };
     var arrows = {};
     var enemies = {};
     var allies = {};
@@ -47,14 +52,17 @@ module.exports = {
       $('#score')[0].innerText = current;
     }
 
-    var updateArcher = function (current, prior, archer, power) {
-      archer.position.x = current.position.x;
+    var updateArcher = function (current, prior, archer, horse, power) {
+      archer.position.x = current.position.x - 20;
       archer.position.y = current.position.y;
+      horse.position.x = current.position.x - 85;
+      horse.position.y = current.position.y;
       power.position.x = current.aim.x;
       power.position.y = current.aim.y - 20;
       archer.rotation = current.rotation;
       $('#health')[0].innerText = current.health;
       // console.log(current.aim.x, current.aim.y);
+
 
     }
 
@@ -74,27 +82,34 @@ module.exports = {
     };
 
     var createEnemy = function () {
-      // var enemy = new PIXI.Graphics();
-      // enemy.beginFill(0xB16161);
-      // enemy.drawCircle(0, 0, 20);
-
-      var horseImages = ["./game/assets/horse01.png","./game/assets/horse02.png","./game/assets/horse03.png","./game/assets/horse04.png","./game/assets/horse05.png"];
-      var textureArray = [];
-
-      for (var i=0; i < 4; i++) {
-           var texture = PIXI.Texture.fromImage(horseImages[i]);
-           textureArray.push(texture);
-      };
-
       var enemy = new PIXI.extras.MovieClip(textureArray);
-      enemy.scale.x = 0.1;
-      enemy.scale.y = 0.1;
-      enemy.animationSpeed = 0.2;
+      // enemy.scale.x = 0.1;
+      // enemy.scale.y = 0.1;
+      enemy.animationSpeed = 0.25;
 
       enemy.play();
 
       return enemy;
     };
+
+    var createArcher = function () {
+      var archer = new PIXI.Sprite.fromImage('./game/assets/archer/arms.png');
+      archer.pivot.y = 32;
+      archer.pivot.x = 20;
+      archer.scale.x = 0.8;
+      archer.scale.y = 0.8;
+      return archer;
+
+    }
+
+    var createArchersHorseAndBody = function () {
+      var horse_and_body = new PIXI.Graphics();
+      var horse = new PIXI.extras.MovieClip(textureArray);
+      horse.animationSpeed = 0.25;
+      horse.play();
+      horse_and_body.addChild(horse);
+      return horse_and_body;
+    }
 
     var createAlly = function () {
       var ally = new PIXI.Graphics();
@@ -112,18 +127,6 @@ module.exports = {
       return power;
     };
 
-    var createArcher = function () {
-      var archer = new PIXI.Sprite.fromImage('./game/assets/archer.png');
-      archer.scale.x = 0.1;
-      archer.scale.y = 0.1;
-      // var archer = new PIXI.Graphics();
-      archer.pivot.y = 256;
-      archer.pivot.x = 64;
-      // archer.beginFill(0x252222)
-      // archer.drawRect(0, 0, 32, 16);
-      return archer;
-
-    }
 
     var createGround = function () {
       var world = new PIXI.Graphics();
@@ -200,6 +203,7 @@ module.exports = {
       $('#' + element()).append(renderer.view);
 
       var archer = createArcher();
+      var horse_and_body = createArchersHorseAndBody();
       var aim = createAim();
       var power = createPower();
 
@@ -208,6 +212,7 @@ module.exports = {
       stage.addChild(archer);
       stage.addChild(aim);
       stage.addChild(power);
+      stage.addChild(horse_and_body);
 
       tracker().onElementAdded(theArrows, addArrow, function(data){}, stage);
       tracker().onElementAdded(theEnemies, addEnemy, function(data){}, stage);
@@ -218,15 +223,24 @@ module.exports = {
       tracker().onElementRemoved(theEnemies, killEnemy);
       tracker().onElementChanged(theAllies, updateAlly);
       tracker().onElementRemoved(theAllies, killAlly);
-      tracker().onChangeOf(theArcher, updateArcher, [archer, power]);
+      tracker().onChangeOf(theArcher, updateArcher, [archer, horse_and_body, power]);
       tracker().onChangeOf(thePower, updatePower, power);
       tracker().onChangeOf(theScore, updateScore);
 
-      define()('OnEachFrame', function () {
-        return function () {
-          renderer.render(stage);
-        };
-      });
+
+      var update = function () {
+        renderer.render(stage);
+        window().requestAnimationFrame(update);
+      }
+
+      window().requestAnimationFrame(update);
+      // define()('OnEachFrame', function () {
+      //   return function (delta) {
+
+      //     // renderer.render(stage);
+
+      //   };
+      // });
       
     }
   }
