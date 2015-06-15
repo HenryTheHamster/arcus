@@ -31,13 +31,13 @@ module.exports = {
     var enemies = {};
     var allies = {};
     var $ = require('zepto-browserify').$;
-    var thePower = function (state) { return state.power; };
-    var theArcher = function (state) { return state.archer; };
-    var theEnemies = function (state) { return state.enemies; };
-    var theAllies = function (state) { return state.allies; };
-    var theArrows = function (state) { return state.arrows; };
-    var theData = function (state) { return state.data; };
-    var theScore = function (state) { return state.score; };
+    var thePower = function (state) { return state.arcus.power; };
+    var theArcher = function (state) { return state.arcus.archer; };
+    var theEnemies = function (state) { return state.arcus.enemies; };
+    var theAllies = function (state) { return state.arcus.allies; };
+    var theArrows = function (state) { return state.arcus.arrows; };
+    var theData = function (state) { return state.arcus.data; };
+    var theScore = function (state) { return state.arcus.score; };
 
     var updateArrow = function (current, prior) {
       arrows[current.id].position.x = current.position.x;
@@ -156,7 +156,7 @@ module.exports = {
     };
 
     var theWorldDimensions = function (state) {
-      return state.world;
+      return state.arcus.world;
     };
 
     var addArrow = function (current, prior, stage) {
