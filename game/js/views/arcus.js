@@ -18,6 +18,7 @@ module.exports = {
     };
     var arrows = {};
     var enemies = {};
+    var enemyCollisions = {};
     var allies = {};
     var $ = require('zepto-browserify').$;
     var thePower = function (state) { return state.arcus.power; };
@@ -37,6 +38,11 @@ module.exports = {
     var updateEnemy = function (current, prior) {
       enemies[current.id].position.x = current.position.x;
       enemies[current.id].position.y = current.position.y;
+    };
+
+    var updateEnemyCollision = function (current, prior) {
+      enemyCollisions[current.id].position.x = current.position.x;
+      enemyCollisions[current.id].position.y = current.position.y;
     };
 
     var updateAlly = function (current, prior) {
@@ -70,6 +76,8 @@ module.exports = {
       var arrow = new PIXI.Graphics();
       arrow.beginFill(0x6D6B68);
       arrow.drawRect(0, 0, -20, 2);
+      arrow.beginFill(0xFF0000);
+      arrow.drawCircle(0,0,5);
       return arrow;
     };
 
@@ -163,6 +171,14 @@ module.exports = {
       stage.addChild(enemies[current.id]);
     };
 
+    var addEnemyCollision = function (current, prior, stage) {
+      var collision = new PIXI.Graphics();
+      collision.lineStyle(2, 0xFF0000);
+      collision.drawCircle(0,0, 10);
+      enemyCollisions[current.id] = collision;
+      stage.addChild(enemyCollisions[current.id]);
+    };
+
     var killEnemy = function (current, prior) {
       mixin(enemies[prior.id], tempEffect(5, 
         function() {
@@ -171,6 +187,16 @@ module.exports = {
           delete enemies[prior.id];    
         }));
       effect().register(enemies[prior.id]);
+    };
+
+    var killEnemyCollision = function (current, prior) {
+      // mixin(enemies[prior.id], tempEffect(5, 
+      //   function() {
+      //     enemies[prior.id].alpha -= 0.01;
+      //   }, function() {
+      delete enemyCollisions[prior.id];    
+      //   })); 
+      // effect().register(enemies[prior.id]);
     };
 
     var killAlly = function (current, prior) {
@@ -216,13 +242,16 @@ module.exports = {
 
       tracker().onElementAdded(theArrows, addArrow, function(data){}, stage);
       tracker().onElementAdded(theEnemies, addEnemy, function(data){}, stage);
+      tracker().onElementAdded(theEnemies, addEnemyCollision, function(data){}, stage);
       tracker().onElementAdded(theAllies, addAlly, function(data){}, stage);
       tracker().onElementChanged(theArrows, updateArrow);
       tracker().onElementRemoved(theArrows, killArrow);
       tracker().onElementChanged(theEnemies, updateEnemy);
+      tracker().onElementChanged(theEnemies, updateEnemyCollision);
       tracker().onElementRemoved(theEnemies, killEnemy);
       tracker().onElementChanged(theAllies, updateAlly);
       tracker().onElementRemoved(theAllies, killAlly);
+      tracker().onElementRemoved(theEnemies, killEnemyCollision);
       tracker().onChangeOf(theArcher, updateArcher, [archer, horse_and_body, power]);
       tracker().onChangeOf(thePower, updatePower, power);
       tracker().onChangeOf(theScore, updateScore);

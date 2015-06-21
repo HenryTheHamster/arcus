@@ -1,5 +1,6 @@
 'use strict;'
 var sequence = require('distributedlife-sequence');
+var SAT = require('sat');
 
 var max_power = 250;
 module.exports = {
@@ -75,10 +76,11 @@ module.exports = {
           var position = state.for('arcus').get('archer')('position');
           arrows.push({
             id: sequence.next('arrows'),
-            position: {
-              x: position('x'),
-              y: position('y')
-            },
+            position: new SAT.Vector(position('x'), position('y')),
+            // position: {
+            //   x: position('x'),
+            //   y: position('y')
+            // },
             velocity: {
               x: Math.cos(rotation) * power,
               y: -Math.sin(rotation) * power

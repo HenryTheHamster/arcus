@@ -1,6 +1,6 @@
 'use strict';
 var sequence = require('distributedlife-sequence');
-
+var SAT = require('sat');
 var gravity = 50;
 var arrow_speed = 3.5;
 
@@ -74,6 +74,7 @@ module.exports = {
                         x: 1200, // MAGIC NUMBER !!
                         y: 350 // MAGIC NUMBER !!
                     },
+                    collision: new SAT.Polygon(new SAT.Vector(1200, 350), 10),
                     velocity: 100.0,
                     health: 20.0,
                     arrows: [],
@@ -124,6 +125,7 @@ module.exports = {
           }
         } else {
           e.position.x -= e.velocity * delta;
+          e.collision.pos.x -= e.velocity * delta;
           e.arrows.forEach(function(a) {
             a.position.x -= e.velocity * delta;
           });
