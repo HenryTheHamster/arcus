@@ -202,13 +202,13 @@ module.exports = {
     };
 
     var killEnemyCollision = function (current, prior) {
-      // mixin(enemies[prior.id], tempEffect(5, 
-      //   function() {
-      //     enemies[prior.id].alpha -= 0.01;
-      //   }, function() {
-      delete enemyCollisions[prior.id];    
-      //   })); 
-      // effect().register(enemies[prior.id]);
+      mixin(enemyCollisions[prior.id], tempEffect(5, 
+        function() {
+          enemyCollisions[prior.id].alpha -= 0.01;
+        }, function() {
+          delete enemyCollisions[prior.id];    
+        })); 
+      effect().register(enemyCollisions[prior.id]);
     };
 
     var killAlly = function (current, prior) {

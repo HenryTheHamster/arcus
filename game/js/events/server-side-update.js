@@ -50,7 +50,7 @@ module.exports = {
             }
           }
           if(a.position.y > 400) {
-            a.live = false;
+            a.destroy = true;
           }
         }
       });
@@ -70,9 +70,13 @@ module.exports = {
                         y: 350 // MAGIC NUMBER !!
                     },
                     collision: new SAT.Polygon(new SAT.Vector(0,0), [
-                      new SAT.Vector(0,0),
-                      new SAT.Vector(100,0),
-                      new SAT.Vector(50,75)
+                      new SAT.Vector(40,5),
+                      new SAT.Vector(60,15),
+                      new SAT.Vector(90,20),
+                      new SAT.Vector(90,40),
+                      new SAT.Vector(50,40),
+                      new SAT.Vector(45,20),
+                      new SAT.Vector(30,20)
                     ]),
                     velocity: 100.0,
                     health: 20.0,
