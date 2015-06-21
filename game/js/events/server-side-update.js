@@ -9,12 +9,7 @@ module.exports = {
   func: function() {
 
     var hitEnemy = function(arrow, enemy) {
-      var xDist = arrow.position.x - enemy.position.x;
-      var yDist = arrow.position.y - enemy.position.y;
-      if(Math.sqrt(Math.pow(xDist, 2) + Math.pow(yDist, 2)) < 20) { // MAGIC NUMBER!!
-        return true;
-      }
-      return false;
+      return SAT.pointInPolygon(arrow.position, enemy.collision);
     }
 
     var updateArrow = function(arrow, delta) {
@@ -74,7 +69,11 @@ module.exports = {
                         x: 1200, // MAGIC NUMBER !!
                         y: 350 // MAGIC NUMBER !!
                     },
-                    collision: new SAT.Polygon(new SAT.Vector(1200, 350), 10),
+                    collision: new SAT.Polygon(new SAT.Vector(0,0), [
+                      new SAT.Vector(0,0),
+                      new SAT.Vector(100,0),
+                      new SAT.Vector(50,75)
+                    ]),
                     velocity: 100.0,
                     health: 20.0,
                     arrows: [],
@@ -125,7 +124,9 @@ module.exports = {
           }
         } else {
           e.position.x -= e.velocity * delta;
-          e.collision.pos.x -= e.velocity * delta;
+          // e.collision.position.x -= e.velocity * delta;
+          e.collision.pos.x = e.position.x;
+          e.collision.pos.y = e.position.y;
           e.arrows.forEach(function(a) {
             a.position.x -= e.velocity * delta;
           });

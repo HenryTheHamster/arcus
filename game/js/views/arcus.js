@@ -41,8 +41,8 @@ module.exports = {
     };
 
     var updateEnemyCollision = function (current, prior) {
-      enemyCollisions[current.id].position.x = current.position.x;
-      enemyCollisions[current.id].position.y = current.position.y;
+      enemyCollisions[current.id].position.x = current.collision.pos.x;
+      enemyCollisions[current.id].position.y = current.collision.pos.y;
     };
 
     var updateAlly = function (current, prior) {
@@ -67,9 +67,6 @@ module.exports = {
       power.position.y = current.aim.y - 20;
       archer.rotation = current.rotation;
       $('#health')[0].innerText = current.health;
-      // console.log(current.aim.x, current.aim.y);
-
-
     }
 
     var createArrow = function () {
@@ -173,8 +170,12 @@ module.exports = {
 
     var addEnemyCollision = function (current, prior, stage) {
       var collision = new PIXI.Graphics();
-      collision.lineStyle(2, 0xFF0000);
-      collision.drawCircle(0,0, 10);
+      collision.moveTo(current.collision.calcPoints[0].x, current.collision.calcPoints[0].y);
+      current.collision.calcPoints.forEach(function(v) {
+        collision.lineStyle(2, 0xFF0000);
+        collision.lineTo(v.x, v.y);
+      });
+      collision.lineTo(current.collision.calcPoints[0].x, current.collision.calcPoints[0].y);
       enemyCollisions[current.id] = collision;
       stage.addChild(enemyCollisions[current.id]);
     };
