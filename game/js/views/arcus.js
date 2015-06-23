@@ -13,7 +13,7 @@ module.exports = {
     var mainTemplate = require('../../views/overlays/arcus.jade');
     var textureArray = [];
     for (var i=1; i <= 5; i++) {
-         var texture = PIXI.Texture.fromImage("./game/assets/horse/horse_and_body" + i + ".png");
+         var texture = PIXI.Texture.fromImage("./game/js/views/assets/horse/horse_and_body" + i + ".png");
          textureArray.push(texture);
     };
     var arrows = {};
@@ -98,7 +98,7 @@ module.exports = {
     };
 
     var createArcher = function () {
-      var archer = new PIXI.Sprite.fromImage('./game/assets/archer/arms.png');
+      var archer = new PIXI.Sprite.fromImage('./game/js/views/assets/archer/arms.png');
       archer.pivot.y = 32;
       archer.pivot.x = 20;
       archer.scale.x = 0.8;
