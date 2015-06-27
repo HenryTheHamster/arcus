@@ -1,14 +1,5 @@
-FROM debian:jessie
-RUN apt-get install npm
-RUN npm i ensemblejs -g
-
-ADD game /app/game
-ADD gulpfile.js /app/gulpfile.js
-ADD package.json /app/package.json
-ADD supporting-libs /app/supporting-libs
- 
-RUN cd /app && npm i
- 
+FROM node:0.10-onbuild
+COPY game gulpfile.js package.json supporting-libs /app
+RUN npm i ensemblejs -g && cd /app && npm i && rm /bin/sh && ln -s /bin/bash /bin/sh
 EXPOSE  3000
-RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 CMD ["start", "/app/game"]
