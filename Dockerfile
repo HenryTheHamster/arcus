@@ -1,6 +1,4 @@
-FROM mhart/alpine-node
-
-RUN apk-install make gcc g++ python
+FROM alpine:3.1
 RUN npm i ensemblejs -g
  
 ADD game /app/game
