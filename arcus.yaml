@@ -1,0 +1,15 @@
+---
+- hosts: arcus
+  tasks:
+  - name: install docker
+    yum: pkg=docker state=latest
+    sudo: yes
+  - name: install docker-py
+    pip: name=docker-py state=latest
+    sudo: yes
+  - name: ensure docker is started
+    service: name=docker state=started
+    sudo: yes
+  - name: install arcus
+    docker: name=arcus image=kallikantzaros/arcus:latest state=reloaded
+    sudo: yes

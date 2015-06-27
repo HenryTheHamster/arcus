@@ -9,7 +9,7 @@ module.exports = {
   func: function() {
 
     var hitEnemy = function(arrow, enemy) {
-      return SAT.pointInPolygon(arrow.position, enemy.collision);
+      // return SAT.pointInPolygon(arrow.position, enemy.collision);
     }
 
     var updateArrow = function(arrow, delta) {

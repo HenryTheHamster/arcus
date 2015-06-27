@@ -3,15 +3,17 @@
   "version": "0.0.1",
   "description": "Simple archery game",
   "engines": {
-    "node": "0.12.5",
-    "npm": "2.11.3"
+    "node": "latest",
+    "npm": "latest"
   },
   "dependencies": {
     "distributedlife-sequence": "^1.0.1",
-    "ensemblejs": "^2.1.2",
-    "ensemblejs-client": "^1.1.1",
+    "ensemblejs": "^4.0.0",
+    "ensemblejs-client": "^1.4.1",
     "pixi.js": "^3.0.6",
-    "zepto-browserify": "^1.1.6-1"
+    "zepto-browserify": "^1.1.6-1",
+    "lodash": "latest",
+    "sat": "latest"
   },
   "devDependencies": {
     "browserify": "^8.1.1",
