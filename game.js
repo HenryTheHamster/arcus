@@ -1,1 +1,1 @@
-require('ensemblejs').runGameAtPath(process.cwd() + '/game');
+require('ensemblejs').runGameAtPath(__dirname + '/game');
