@@ -1,7 +1,6 @@
-FROM node:latest
- 
-MAINTAINER Ryan Boucher ryan.boucher@distributedlife.com
- 
+FROM mhart/alpine-node
+
+RUN apk-install make gcc g++ python
 RUN npm i ensemblejs -g
  
 ADD game /app/game

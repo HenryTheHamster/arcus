@@ -1,10 +1,10 @@
 {
-  "name": "ensemblejs-game-skeleton",
+  "name": "arcus",
   "version": "0.0.1",
-  "description": "Your game description goes here",
+  "description": "Simple archery game",
   "engines": {
-    "node": "latest",
-    "npm": "latest"
+    "node": "0.12.5",
+    "npm": "2.11.3"
   },
   "dependencies": {
     "distributedlife-sequence": "^1.0.1",
