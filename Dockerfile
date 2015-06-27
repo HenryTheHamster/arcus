@@ -1,6 +1,7 @@
-FROM alpine:3.1
+FROM debian:jessie
+RUN apt-get install npm
 RUN npm i ensemblejs -g
- 
+
 ADD game /app/game
 ADD gulpfile.js /app/gulpfile.js
 ADD package.json /app/package.json
