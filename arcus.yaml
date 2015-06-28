@@ -11,5 +11,5 @@
     service: name=docker state=started
     sudo: yes
   - name: install arcus
-    docker: name=arcus image=kallikantzaros/arcus:latest state=reloaded
+    docker: name=arcus image=kallikantzaros/arcus:latest state=reloaded ports=80:3000
     sudo: yes
