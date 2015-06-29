@@ -8,12 +8,12 @@
   },
   "dependencies": {
     "distributedlife-sequence": "^1.0.1",
-    "ensemblejs": "^4.0.0",
+    "ensemblejs": "^4.1.1",
     "ensemblejs-client": "^1.4.1",
-    "pixi.js": "^3.0.6",
-    "zepto-browserify": "^1.1.6-1",
     "lodash": "latest",
-    "sat": "latest"
+    "pixi.js": "^3.0.6",
+    "sat": "latest",
+    "zepto-browserify": "^1.1.6-1"
   },
   "devDependencies": {
     "browserify": "^8.1.1",
@@ -34,6 +34,10 @@
     "jade": "^1.9.2",
     "jadeify": "^4.2.0",
     "vinyl-transform": "^1.0.0"
+  },
+  "scripts": {
+    "start": "gulp && node game.js | bunyan -o short -l info",
+    "test": "gulp test"
   },
   "browserify": {
     "transform": [

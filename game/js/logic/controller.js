@@ -98,7 +98,7 @@ module.exports = {
           };
         }
       },
-      addAlly: function() {
+      addAlly: function(state) {
           var allies = state.for('arcus').get('allies');
           var allyCooldown = state.for('arcus').get('allyCooldown');
           if(allyCooldown <= 0) {

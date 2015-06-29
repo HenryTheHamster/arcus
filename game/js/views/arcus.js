@@ -257,14 +257,11 @@ module.exports = {
       tracker().onChangeOf(thePower, updatePower, power);
       tracker().onChangeOf(theScore, updateScore);
 
-
-      var update = function () {
-        renderer.render(stage);
-        window().requestAnimationFrame(update);
-      }
-
-      window().requestAnimationFrame(update);
-      
+      define()("OnEachFrame", function () {
+        return function() {
+          renderer.render(stage);
+        };
+      });
     }
   }
 }
