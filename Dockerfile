@@ -4,4 +4,4 @@ COPY game /app/game/
 COPY supporting-libs /app/supporting-libs/
 RUN npm i ensemblejs -g && cd /app && npm i && rm /bin/sh && ln -s /bin/bash /bin/sh
 EXPOSE  3000
-CMD ["npm", "start"]
+CMD ["npm", "start", "/app"]
