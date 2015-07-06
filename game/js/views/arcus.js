@@ -58,6 +58,17 @@ module.exports = {
       $('#score')[0].innerText = current;
     }
 
+    var updateLeaves = function (front, back, width) {
+      if(front.position.x >= 0) {
+        front.position.x = -front.width + width;
+      }
+      if(back.position.x >= 0) {
+        back.position.x = -back.width + width;
+      }
+      front.position.x += 2;
+      back.position.x += 1;
+    }
+
     var updateArcher = function (current, prior, archer, horse, power) {
       archer.position.x = current.position.x - 20;
       archer.position.y = current.position.y;
@@ -139,6 +150,16 @@ module.exports = {
       world.drawRect(0, 400, tracker().get(theWorldDimensions).width, tracker().get(theWorldDimensions).height - 400);
 
       return world;
+    };
+
+    var createFrontLeaves = function () {
+      var leaves = new PIXI.Sprite.fromImage('./game/js/views/assets/trees/foliage01.png');
+      return leaves;
+    };
+
+    var createBackLeaves = function () {
+      var leaves = new PIXI.Sprite.fromImage('./game/js/views/assets/trees/foliage02.png');
+      return leaves;
     };
 
     var createWorld = function () {
@@ -233,6 +254,8 @@ module.exports = {
       var horse_and_body = createArchersHorseAndBody();
       var aim = createAim();
       var power = createPower();
+      var frontLeaves = createFrontLeaves();
+      var backLeaves = createBackLeaves();
 
       stage.addChild(createWorld());
       stage.addChild(createGround());
@@ -240,6 +263,8 @@ module.exports = {
       stage.addChild(aim);
       stage.addChild(power);
       stage.addChild(horse_and_body);
+      stage.addChild(backLeaves);
+      stage.addChild(frontLeaves);
 
       tracker().onElementAdded(theArrows, addArrow, function(data){}, stage);
       tracker().onElementAdded(theEnemies, addEnemy, function(data){}, stage);
@@ -259,6 +284,7 @@ module.exports = {
 
       define()("OnEachFrame", function () {
         return function() {
+          updateLeaves(frontLeaves, backLeaves, renderer.width);
           renderer.render(stage);
         };
       });
