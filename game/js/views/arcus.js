@@ -12,14 +12,20 @@ module.exports = {
     var tempEffect = require('../../../supporting-libs/src/temporary_effect');
     var mainTemplate = require('../../views/overlays/arcus.jade');
     var textureArray = [];
+    var trunkImages = [];
     for (var i=1; i <= 5; i++) {
          var texture = PIXI.Texture.fromImage("./game/js/views/assets/horse/horse_and_body" + i + ".png");
          textureArray.push(texture);
+    };
+    for (var i=1; i <= 6; i++) {
+         var trunkSprite = "./game/js/views/assets/background/trunk" + i + ".png";
+         trunkImages.push(trunkSprite);
     };
     var arrows = {};
     var enemies = {};
     var enemyCollisions = {};
     var allies = {};
+    var trunks = new Array(6);
     var $ = require('zepto-browserify').$;
     var thePower = function (state) { return state.arcus.power; };
     var theArcher = function (state) { return state.arcus.archer; };
@@ -58,15 +64,25 @@ module.exports = {
       $('#score')[0].innerText = current;
     }
 
-    var updateLeaves = function (front, back, width) {
+    var updateLeaves = function (front, back, mountains, width) {
+      if(mountains.position.x >= 0) {
+        mountains.position.x = -mountains.width + width;
+      }
       if(front.position.x >= 0) {
         front.position.x = -front.width + width;
       }
       if(back.position.x >= 0) {
         back.position.x = -back.width + width;
       }
-      front.position.x += 2;
-      back.position.x += 1;
+      for (var i=0; i < trunks.length; i++) {
+        if(trunks[i].position.x >= width) {
+          trunks[i].position.x = -(Math.random() * width);
+        }
+        trunks[i].position.x += 1;
+      }
+      mountains.x += 0.2;
+      front.position.x += 1;
+      back.position.x += 0.5;
     }
 
     var updateArcher = function (current, prior, archer, horse, power) {
@@ -78,6 +94,23 @@ module.exports = {
       power.position.y = current.aim.y - 20;
       archer.rotation = current.rotation;
       $('#health')[0].innerText = current.health;
+    }
+
+    var createTrunk = function (width) {
+      var trunk = PIXI.Sprite.fromImage(trunkImages[Math.floor((Math.random() * 6))]);
+      trunk.position.x += (Math.random() * 2 * width) - width;
+      trunk.scale.x = 0.8;
+      trunk.scale.y = 0.8;
+      return trunk;
+    }
+
+    var createMountains = function () {
+      var mountains = PIXI.Sprite.fromImage('./game/js/views/assets/background/mountains.png');
+      mountains.scale.x = 1.6;
+      mountains.scale .y= 1.6;
+      mountains.position.y += 170;
+      mountains.tint = 0xABA89F;
+      return mountains;
     }
 
     var createArrow = function () {
@@ -99,8 +132,6 @@ module.exports = {
 
     var createEnemy = function () {
       var enemy = new PIXI.extras.MovieClip(textureArray);
-      // enemy.scale.x = 0.1;
-      // enemy.scale.y = 0.1;
       enemy.animationSpeed = 0.25;
 
       enemy.play();
@@ -144,28 +175,32 @@ module.exports = {
     };
 
 
-    var createGround = function () {
+    var createGround = function (width, height) {
       var world = new PIXI.Graphics();
       world.beginFill(0x636363);
-      world.drawRect(0, 400, tracker().get(theWorldDimensions).width, tracker().get(theWorldDimensions).height - 400);
+      world.drawRect(0, 400, width, height - 400);
 
       return world;
     };
 
     var createFrontLeaves = function () {
-      var leaves = new PIXI.Sprite.fromImage('./game/js/views/assets/trees/foliage01.png');
+      var leaves = new PIXI.Sprite.fromImage('./game/js/views/assets/background/foliage01.png');
+      leaves.scale.x = 1.5;
+      leaves.scale.y = 1.5;
       return leaves;
     };
 
     var createBackLeaves = function () {
-      var leaves = new PIXI.Sprite.fromImage('./game/js/views/assets/trees/foliage02.png');
+      var leaves = new PIXI.Sprite.fromImage('./game/js/views/assets/background/foliage02.png');
+      leaves.scale.x = 1.5;
+      leaves.scale.y = 1.5;
       return leaves;
     };
 
-    var createWorld = function () {
+    var createWorld = function (width, height) {
       var world = new PIXI.Graphics();
       world.beginFill(0xF2ECDE);
-      world.drawRect(0, 0, tracker().get(theWorldDimensions).width, tracker().get(theWorldDimensions).height);
+      world.drawRect(0, 0, width, height);
 
       return world;
     };
@@ -176,7 +211,7 @@ module.exports = {
 
     var addArrow = function (current, prior, stage) {
       arrows[current.id] = createArrow();
-      stage.addChild(arrows[current.id]);
+      stage.addChildAt(arrows[current.id], 6);
     };
 
     var addAlly = function (current, prior, stage) {
@@ -256,24 +291,29 @@ module.exports = {
       var power = createPower();
       var frontLeaves = createFrontLeaves();
       var backLeaves = createBackLeaves();
-
-      stage.addChild(createWorld());
-      stage.addChild(createGround());
+      var mountains = createMountains();
+      stage.addChild(createWorld(renderer.width, renderer.height));
+      stage.addChild(mountains);
+      stage.addChild(createGround(renderer.width, renderer.height));
       stage.addChild(archer);
       stage.addChild(aim);
       stage.addChild(power);
       stage.addChild(horse_and_body);
       stage.addChild(backLeaves);
+      for(var i = 0; i < 6; i++) {
+        trunks[i] = createTrunk(renderer.width);
+        stage.addChild(trunks[i], 7);
+      }
       stage.addChild(frontLeaves);
 
       tracker().onElementAdded(theArrows, addArrow, function(data){}, stage);
       tracker().onElementAdded(theEnemies, addEnemy, function(data){}, stage);
-      tracker().onElementAdded(theEnemies, addEnemyCollision, function(data){}, stage);
+      // tracker().onElementAdded(theEnemies, addEnemyCollision, function(data){}, stage);
       tracker().onElementAdded(theAllies, addAlly, function(data){}, stage);
       tracker().onElementChanged(theArrows, updateArrow);
       tracker().onElementRemoved(theArrows, killArrow);
       tracker().onElementChanged(theEnemies, updateEnemy);
-      tracker().onElementChanged(theEnemies, updateEnemyCollision);
+      // tracker().onElementChanged(theEnemies, updateEnemyCollision);
       tracker().onElementRemoved(theEnemies, killEnemy);
       tracker().onElementChanged(theAllies, updateAlly);
       tracker().onElementRemoved(theAllies, killAlly);
@@ -284,7 +324,8 @@ module.exports = {
 
       define()("OnEachFrame", function () {
         return function() {
-          updateLeaves(frontLeaves, backLeaves, renderer.width);
+          updateLeaves(frontLeaves, backLeaves, mountains, renderer.width);
+
           renderer.render(stage);
         };
       });
