@@ -8,8 +8,8 @@
   },
   "dependencies": {
     "distributedlife-sequence": "^1.0.1",
-    "ensemblejs": "latest",
-    "ensemblejs-client": "latest",
+    "ensemblejs": "^4.x",
+    "ensemblejs-client": "^2.x",
     "lodash": "latest",
     "pixi.js": "^3.0.6",
     "sat": "latest",
