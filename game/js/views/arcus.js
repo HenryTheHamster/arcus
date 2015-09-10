@@ -199,7 +199,8 @@ module.exports = {
 
     var createWorld = function (width, height) {
       var world = new PIXI.Graphics();
-      world.beginFill(0xF2ECDE);
+      // world.beginFill(0xF2ECDE);
+      world.beginFill(0x6900FF);
       world.drawRect(0, 0, width, height);
 
       return world;
