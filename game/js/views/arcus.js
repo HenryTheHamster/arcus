@@ -9,7 +9,7 @@ module.exports = {
   deps: ['Element', 'Dimensions', 'StateTracker', 'StateTrackerHelpers', 'DefinePlugin', 'RegisterEffect', 'Window'],
   func: function (element, dimensions, tracker, helpers, define, effect, window) {
     var input, context;
-    var tempEffect = require('../../../supporting-libs/src/temporary_effect');
+    var tempEffect = require('../supporting-libs/temporary_effect');
     var mainTemplate = require('../../views/overlays/arcus.jade');
     var textureArray = [];
     var trunkImages = [];

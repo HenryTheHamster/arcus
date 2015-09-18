@@ -5,6 +5,7 @@ module.exports = {
   func: function () {
     return {
       arcus: {
+        state: 'menu',
         archer: {position: {x: 100, y: 340},
                  rotation: 0,
                  aim: {x: 0, y: 0},
