@@ -6,8 +6,8 @@ var PIXI = require('pixi.js');
 
 module.exports = {
   type: 'View',
-  deps: ['Element', 'Dimensions', 'StateTracker', 'StateTrackerHelpers', 'DefinePlugin', 'RegisterEffect', 'Window'],
-  func: function (element, dimensions, tracker, helpers, define, effect, window) {
+  deps: ['Element', 'Dimensions', 'StateTracker', 'StateTrackerHelpers', 'DefinePlugin', 'RegisterEffect', 'Window', '$'],
+  func: function (element, dimensions, tracker, helpers, define, effect, window, $) {
     var input, context;
     var tempEffect = require('../supporting-libs/temporary_effect');
     var mainTemplate = require('../../views/overlays/arcus.jade');
@@ -26,7 +26,6 @@ module.exports = {
     var enemyCollisions = {};
     var allies = {};
     var trunks = new Array(6);
-    var $ = require('zepto-browserify').$;
     var thePower = function (state) { return state.arcus.power; };
     var theArcher = function (state) { return state.arcus.archer; };
     var theEnemies = function (state) { return state.arcus.enemies; };
@@ -281,10 +280,10 @@ module.exports = {
     var offset;
     return function (dims) {
 
-      $('#overlay').append(mainTemplate());
+      $()('#overlay').append(mainTemplate());
       var stage = new PIXI.Container();
       var renderer = PIXI.autoDetectRenderer(dims.usableWidth, dims.usableHeight);
-      $('#' + element()).append(renderer.view);
+      $()('#' + element()).append(renderer.view);
 
       var archer = createArcher();
       var horse_and_body = createArchersHorseAndBody();
@@ -293,9 +292,9 @@ module.exports = {
       var frontLeaves = createFrontLeaves();
       var backLeaves = createBackLeaves();
       var mountains = createMountains();
-      stage.addChild(createWorld(renderer.width, renderer.height));
+      stage.addChild(createWorld(dims.usableWidth, dims.usableHeight));
       stage.addChild(mountains);
-      stage.addChild(createGround(renderer.width, renderer.height));
+      stage.addChild(createGround(dims.usableWidth, dims.usableHeight));
       stage.addChild(archer);
       stage.addChild(aim);
       stage.addChild(power);
@@ -326,8 +325,13 @@ module.exports = {
       define()("OnEachFrame", function () {
         return function() {
           updateLeaves(frontLeaves, backLeaves, mountains, renderer.width);
-
           renderer.render(stage);
+        };
+      });
+
+      define()("OnResize", function () {
+        return function(dims) {
+          renderer.resize(dims.usableWidth, dims.usableHeight);
         };
       });
     }
