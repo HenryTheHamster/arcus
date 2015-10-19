@@ -3,8 +3,8 @@
   "version": "0.0.1",
   "description": "Simple archery game",
   "engines": {
-    "node": "latest",
-    "npm": "latest"
+    "node": "^0.12.0",
+    "npm": "^2.14.0"
   },
   "dependencies": {
     "distributedlife-sequence": "^1.0.1",
