@@ -5,7 +5,7 @@ var gravity = 50;
 var arrow_speed = 3.5;
 
 module.exports = {
-  type: 'ServerSideUpdate',
+  type: 'OnPhysicsFrame',
   func: function() {
 
     var hitEnemy = function(arrow, enemy) {

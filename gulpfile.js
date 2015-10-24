@@ -11,6 +11,8 @@ var browserify = require('browserify');
 var plumber = require('gulp-plumber');
 var sourcemaps = require('gulp-sourcemaps');
 var transform = require('vinyl-transform');
+var fs = require('fs');
+var getRepoInfo = require('git-repo-info');
 
 var paths = {
   js: ['game/**/*.js', '!game/js/gen/**'],
@@ -18,7 +20,8 @@ var paths = {
   css: ['game/css'],
   tests: ['tests/**/*.js'],
   genjs: './game/js/gen',
-  modes: ['./game/js/*.js']
+  build: ['./game/js/gen', 'build/**'],
+  modes: ['./build/*.js']
 };
 
 var onError = function (error) {
@@ -31,7 +34,7 @@ gulp.task('delete-gen-css', function (cb) {
     del(paths.css, cb);
 });
 gulp.task('delete-gen-code', function (cb) {
-    del(paths.genjs, cb);
+    del(paths.build, cb);
 });
 gulp.task('clean', ['delete-gen-css', 'delete-gen-code']);
 
@@ -40,13 +43,68 @@ gulp.task('test', ['clean'], function () {
         .pipe(mocha({reporter: 'spec'}));
 });
 
-gulp.task('build-code', function() {
+gulp.task('prep', ['clean'], function (cb) {
+    fs.mkdir('build', cb);
+});
+
+function generateEntrypointFile (mode, done) {
+  var filename = ['build/', mode, '.js'].join('');
+
+  var fromFile = fs.createReadStream('node_modules/ensemblejs/default.entrypoint.js');
+  var toFile = fs.createWriteStream(filename);
+
+  fromFile.pipe(toFile, { end: false });
+  fromFile.on('end', function() {
+      toFile.write('\n');
+      toFile.write('entryPoint.set("GameMode", "' + mode + '");');
+      toFile.write('entryPoint.set("Commit", "' + getRepoInfo().sha + '");');
+      toFile.write('\n');
+      toFile.end('entryPoint.run();');
+      done();
+  });
+}
+
+gulp.task('copy-single-entry-point', ['prep'], function (cb) {
+    fs.exists('game/js/modes.json', function (exists) {
+        if (exists) {
+            return cb();
+        }
+
+        generateEntrypointFile('game', cb);
+    });
+});
+
+gulp.task('copy-multi-entry-points', ['prep'], function (cb) {
+    fs.exists('game/js/modes.json', function (exists) {
+        if (!exists) {
+            return cb();
+        }
+
+        var arr = require('./game/js/modes.json');
+        var copyCount = 0;
+
+        function copied () {
+            copyCount += 1;
+            if (copyCount === arr.length) {
+                cb();
+            }
+        }
+
+        var i;
+        for(i = 0; i < arr.length; i += 1) {
+            generateEntrypointFile(arr[i], copied);
+        }
+    });
+});
+
+gulp.task('generate-entrypoints', ['copy-multi-entry-points', 'copy-single-entry-point']);
+
+gulp.task('build-code', ['generate-entrypoints'], function() {
     var browserified = transform(function(filename) {
         var b = browserify(filename);
         return b.bundle();
     });
 
-    var fs = require('fs');
     fs.mkdir('game/js/gen', function() {
         fs.writeFileSync('game/js/gen/common.min.js', '');
     });

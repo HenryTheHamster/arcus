@@ -5,20 +5,20 @@ var mixin = require('lodash').mixin;
 var PIXI = require('pixi.js');
 
 module.exports = {
-  type: 'View',
-  deps: ['Element', 'Dimensions', 'StateTracker', 'StateTrackerHelpers', 'DefinePlugin', 'RegisterEffect', 'Window', '$'],
-  func: function (element, dimensions, tracker, helpers, define, effect, window, $) {
+  type: 'OnClientReady',
+  deps: ['Config', 'Dimensions', 'StateTracker', 'StateTrackerHelpers', 'DefinePlugin', 'RegisterEffect', 'Window', '$'],
+  func: function (config, dimensions, tracker, helpers, define, effect, window, $) {
     var input, context;
     var tempEffect = require('../supporting-libs/temporary_effect');
     var mainTemplate = require('../../views/overlays/arcus.jade');
     var textureArray = [];
     var trunkImages = [];
     for (var i=1; i <= 5; i++) {
-         var texture = PIXI.Texture.fromImage("./game/js/views/assets/horse/horse_and_body" + i + ".png");
+         var texture = PIXI.Texture.fromImage("/game/images/horse/horse_and_body" + i + ".png");
          textureArray.push(texture);
     };
     for (var i=1; i <= 6; i++) {
-         var trunkSprite = "./game/js/views/assets/background/trunk" + i + ".png";
+         var trunkSprite = "/game/images/background/trunk" + i + ".png";
          trunkImages.push(trunkSprite);
     };
     var arrows = {};
@@ -34,32 +34,32 @@ module.exports = {
     var theData = function (state) { return state.arcus.data; };
     var theScore = function (state) { return state.arcus.score; };
 
-    var updateArrow = function (current, prior) {
-      arrows[current.id].position.x = current.position.x;
-      arrows[current.id].position.y = current.position.y;
-      arrows[current.id].rotation = current.rotation;
+    var updateArrow = function (id, current, prior) {
+      arrows[id].position.x = current.position.x;
+      arrows[id].position.y = current.position.y;
+      arrows[id].rotation = current.rotation;
     };
 
-    var updateEnemy = function (current, prior) {
-      enemies[current.id].position.x = current.position.x;
-      enemies[current.id].position.y = current.position.y;
+    var updateEnemy = function (id, current, prior) {
+      enemies[id].position.x = current.position.x;
+      enemies[id].position.y = current.position.y;
     };
 
-    var updateEnemyCollision = function (current, prior) {
-      enemyCollisions[current.id].position.x = current.collision.pos.x;
-      enemyCollisions[current.id].position.y = current.collision.pos.y;
+    var updateEnemyCollision = function (id, current, prior) {
+      enemyCollisions[id].position.x = current.collision.pos.x;
+      enemyCollisions[id].position.y = current.collision.pos.y;
     };
 
-    var updateAlly = function (current, prior) {
-      allies[current.id].position.x = current.position.x;
-      allies[current.id].position.y = current.position.y;
+    var updateAlly = function (id, current, prior) {
+      allies[id].position.x = current.position.x;
+      allies[id].position.y = current.position.y;
     };
 
-    var updatePower = function (current, prior, power) {
+    var updatePower = function (id, current, prior, power) {
       power.scale.x = current;
     };
 
-    var updateScore = function (current, prior) {
+    var updateScore = function (id, current, prior) {
       $('#score')[0].innerText = current;
     }
 
@@ -84,7 +84,7 @@ module.exports = {
       back.position.x += 0.5;
     }
 
-    var updateArcher = function (current, prior, archer, horse, power) {
+    var updateArcher = function (id, element, archer, horse, power) {
       archer.position.x = current.position.x - 20;
       archer.position.y = current.position.y;
       horse.position.x = current.position.x - 85;
@@ -104,9 +104,11 @@ module.exports = {
     }
 
     var createMountains = function () {
-      var mountains = PIXI.Sprite.fromImage('./game/js/views/assets/background/mountains.png');
-      mountains.scale.x = 1.6;
-      mountains.scale .y= 1.6;
+      var mountains = PIXI.Sprite.fromImage('/game/images/background/mountains.png');
+      // mountains.scale.x = 1.6;
+      // mountains.scale .y= 1.6;
+      // mountains.width = mountains.width * 1.6;
+      // mountains.height = mountains.height * 1.6;
       mountains.position.y += 170;
       mountains.tint = 0xABA89F;
       return mountains;
@@ -139,7 +141,7 @@ module.exports = {
     };
 
     var createArcher = function () {
-      var archer = new PIXI.Sprite.fromImage('./game/js/views/assets/archer/arms.png');
+      var archer = new PIXI.Sprite.fromImage('/game/images/archer/arms.png');
       archer.pivot.y = 32;
       archer.pivot.x = 20;
       archer.scale.x = 0.8;
@@ -183,14 +185,14 @@ module.exports = {
     };
 
     var createFrontLeaves = function () {
-      var leaves = new PIXI.Sprite.fromImage('./game/js/views/assets/background/foliage01.png');
+      var leaves = new PIXI.Sprite.fromImage('/game/images/background/foliage01.png');
       leaves.scale.x = 1.5;
       leaves.scale.y = 1.5;
       return leaves;
     };
 
     var createBackLeaves = function () {
-      var leaves = new PIXI.Sprite.fromImage('./game/js/views/assets/background/foliage02.png');
+      var leaves = new PIXI.Sprite.fromImage('/game/images/background/foliage02.png');
       leaves.scale.x = 1.5;
       leaves.scale.y = 1.5;
       return leaves;
@@ -199,7 +201,7 @@ module.exports = {
     var createWorld = function (width, height) {
       var world = new PIXI.Graphics();
       // world.beginFill(0xF2ECDE);
-      world.beginFill(0x6900FF);
+      world.beginFill(0xEEEEEE);
       world.drawRect(0, 0, width, height);
 
       return world;
@@ -209,61 +211,62 @@ module.exports = {
       return state.arcus.world;
     };
 
-    var addArrow = function (current, prior, stage) {
-      arrows[current.id] = createArrow();
-      stage.addChildAt(arrows[current.id], 6);
+    var addArrow = function (id, element, stage) {
+      arrows[id] = createArrow();
+      stage.addChildAt(arrows[id], 6);
     };
 
-    var addAlly = function (current, prior, stage) {
-      allies[current.id] = createAlly();
-      stage.addChild(allies[current.id]);
+    var addAlly = function (id, element, stage) {
+      allies[id] = createAlly();
+      stage.addChild(allies[id]);
     };
 
-    var addEnemy = function (current, prior, stage) {
-      enemies[current.id] = createEnemy();
-      stage.addChild(enemies[current.id]);
+    var addEnemy = function (id, element, stage) {
+      console.log(arguments);
+      enemies[id] = createEnemy();
+      stage.addChild(enemies[id]);
     };
 
-    var addEnemyCollision = function (current, prior, stage) {
+    var addEnemyCollision = function (id, element, stage) {
       var collision = new PIXI.Graphics();
-      collision.moveTo(current.collision.calcPoints[0].x, current.collision.calcPoints[0].y);
-      current.collision.calcPoints.forEach(function(v) {
+      collision.moveTo(element.collision.calcPoints[0].x, element.collision.calcPoints[0].y);
+      element.collision.calcPoints.forEach(function(v) {
         collision.lineStyle(2, 0xFF0000);
         collision.lineTo(v.x, v.y);
       });
-      collision.lineTo(current.collision.calcPoints[0].x, current.collision.calcPoints[0].y);
-      enemyCollisions[current.id] = collision;
-      stage.addChild(enemyCollisions[current.id]);
+      collision.lineTo(element.collision.calcPoints[0].x, element.collision.calcPoints[0].y);
+      enemyCollisions[id] = collision;
+      stage.addChild(enemyCollisions[id]);
     };
 
-    var killEnemy = function (current, prior) {
-      mixin(enemies[prior.id], tempEffect(5, 
+    var killEnemy = function (id, element) {
+      mixin(enemies[id], tempEffect(5, 
         function() {
-          enemies[prior.id].alpha -= 0.01;
+          enemies[id].alpha -= 0.01;
         }, function() {
-          delete enemies[prior.id];    
+          delete enemies[id];    
         }));
-      effect().register(enemies[prior.id]);
+      effect().register(enemies[id]);
     };
 
-    var killEnemyCollision = function (current, prior) {
-      mixin(enemyCollisions[prior.id], tempEffect(5, 
+    var killEnemyCollision = function (id, element) {
+      mixin(enemyCollisions[id], tempEffect(5, 
         function() {
-          enemyCollisions[prior.id].alpha -= 0.01;
+          enemyCollisions[id].alpha -= 0.01;
         }, function() {
-          delete enemyCollisions[prior.id];    
+          delete enemyCollisions[id];    
         })); 
-      effect().register(enemyCollisions[prior.id]);
+      effect().register(enemyCollisions[id]);
     };
 
-    var killAlly = function (current, prior) {
-      mixin(allies[prior.id], tempEffect(5, 
+    var killAlly = function (id, element) {
+      mixin(allies[id], tempEffect(5, 
         function() {
-          allies[prior.id].alpha -= 0.01;
+          allies[id].alpha -= 0.01;
         }, function() {
-          delete allies[prior.id];    
+          delete allies[id];    
         }));
-      effect().register(allies[prior.id]);
+      effect().register(allies[id]);
     };
 
     var killArrow = function (current, prior) {
@@ -283,7 +286,9 @@ module.exports = {
       $()('#overlay').append(mainTemplate());
       var stage = new PIXI.Container();
       var renderer = PIXI.autoDetectRenderer(dims.usableWidth, dims.usableHeight);
-      $()('#' + element()).append(renderer.view);
+      stage.width = dims.usableWidth;
+      stage.height = dims.usableHeight;
+      $()('#' + config().client.element).append(renderer.view);
 
       var archer = createArcher();
       var horse_and_body = createArchersHorseAndBody();
@@ -306,14 +311,14 @@ module.exports = {
       }
       stage.addChild(frontLeaves);
 
-      tracker().onElementAdded(theArrows, addArrow, function(data){}, stage);
-      tracker().onElementAdded(theEnemies, addEnemy, function(data){}, stage);
-      // tracker().onElementAdded(theEnemies, addEnemyCollision, function(data){}, stage);
-      tracker().onElementAdded(theAllies, addAlly, function(data){}, stage);
+      tracker().onElementAdded(theArrows, addArrow, function(data){data.forEach(addArrow)}, stage);
+      tracker().onElementAdded(theEnemies, addEnemy, function(data){data.forEach(addEnemy)}, stage);
+      tracker().onElementAdded(theEnemies, addEnemyCollision, function(data){data.forEach(addEnemyCollision)}, stage);
+      tracker().onElementAdded(theAllies, addAlly, function(data){data.forEach(addAlly)}, stage);
       tracker().onElementChanged(theArrows, updateArrow);
       tracker().onElementRemoved(theArrows, killArrow);
       tracker().onElementChanged(theEnemies, updateEnemy);
-      // tracker().onElementChanged(theEnemies, updateEnemyCollision);
+      tracker().onElementChanged(theEnemies, updateEnemyCollision);
       tracker().onElementRemoved(theEnemies, killEnemy);
       tracker().onElementChanged(theAllies, updateAlly);
       tracker().onElementRemoved(theAllies, killAlly);
@@ -322,7 +327,7 @@ module.exports = {
       tracker().onChangeOf(thePower, updatePower, power);
       tracker().onChangeOf(theScore, updateScore);
 
-      define()("OnEachFrame", function () {
+      define()("OnRenderFrame", function () {
         return function() {
           updateLeaves(frontLeaves, backLeaves, mountains, renderer.width);
           renderer.render(stage);
@@ -332,6 +337,9 @@ module.exports = {
       define()("OnResize", function () {
         return function(dims) {
           renderer.resize(dims.usableWidth, dims.usableHeight);
+          var ratio = Math.min(dims.screenWidth/config().client.viewportWidth, 
+                               dims.screenHeight/config().client.viewportHeight);
+          stage.scale.x = stage.scale.y = ratio;
         };
       });
     }

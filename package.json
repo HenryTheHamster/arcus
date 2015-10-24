@@ -8,11 +8,10 @@
   },
   "dependencies": {
     "distributedlife-sequence": "^1.0.1",
-    "ensemblejs": "^5.x",
+    "ensemblejs": "^5.0.0",
     "lodash": "latest",
     "pixi.js": "^3.0.6",
-    "sat": "latest",
-    "zepto-browserify": "^1.1.6-1"
+    "sat": "latest"
   },
   "devDependencies": {
     "browserify": "^8.1.1",
@@ -48,7 +47,8 @@
           "compileDebug": false,
           "pretty": false
         }
-      ]
+      ],
+      "require-globify"
     ]
   },
   "browserify-shim": {

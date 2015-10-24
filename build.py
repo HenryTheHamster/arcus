@@ -16,15 +16,15 @@ SOURCE = { 'js': glob.glob('game/js/*.js'),
             'scss': glob.glob('game/scss/*.scss') }
 
 
-DIST = { 'root': 'dist',
-          'js': glob.glob('dist/js/*.js'),
-          'css': glob.glob('dist/css/*.css'),
-          'css_map': glob.glob('dist/css/*.css.map') }
+DIST = { 'root': 'gen',
+          'js': glob.glob('gen/js/*.js'),
+          'css': glob.glob('gen/css/*.css'),
+          'css_map': glob.glob('gen/css/*.css.map') }
 
 # clean
 print 'clean'
 
-for f in ["game/js/gen", "game/css", "dist", "build"]:
+for f in ["game/js/gen", "game/css", "gen", "build"]:
   shutil.rmtree(f, ignore_errors=True)
 
 print 'npm install'
@@ -34,7 +34,7 @@ if ret != 0:
 
 print 'preflight'
 # preflight
-for f in ["dist/js", "dist/css", "game/js/gen", "game/css", "build"]:
+for f in ["gen/js", "gen/css", "game/js/gen", "game/css", "build"]:
   os.makedirs(f)
 
 # generate entry-points
