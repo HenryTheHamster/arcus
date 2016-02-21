@@ -3,3 +3,7 @@ node_modules
 game/assets/*.pxi
 game/assets/*.pxa/
 inv
+couchdb.stderr
+couchdb.stdout
+dist
+build

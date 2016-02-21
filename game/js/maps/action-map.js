@@ -5,14 +5,14 @@ module.exports = {
   deps: ['GameBehaviour-Controller'],
   func: function (controller) {
     return {
-      'cursor': [{target: controller().cursor}],
+      'cursor': [{call: controller().cursor}],
       'button1': [
-        {target: controller().fire, onRelease: true},
-        {target: controller().powerUp}
+        {call: controller().fire, onRelease: true},
+        {call: controller().powerUp}
       ],
-      'left': [{target: controller().left}],
-      'right': [{target: controller().right}],
-      'space': [{target: controller().addAlly}]
+      'left': [{call: controller().left}],
+      'right': [{call: controller().right}],
+      'space': [{call: controller().addAlly}]
     };
   }
 };

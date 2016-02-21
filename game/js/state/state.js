@@ -6,10 +6,12 @@ module.exports = {
     return {
       arcus: {
         state: 'menu',
-        archer: {position: {x: 100, y: 340},
-                 rotation: 0,
-                 aim: {x: 0, y: 0},
-                 health: 100 }, 
+        archer: {
+          position: {x: 100, y: 340},
+          rotation: 0,
+          aim: {x: 0, y: 0},
+          health: 100
+        },
         cursor: {x: 0, y: 0},
         arrows: [],
         attackCooldown: 90,
